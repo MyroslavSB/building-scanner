@@ -1,5 +1,6 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {EUserRoles} from "./utils/enums/e-user-roles";
+import {BuildingEntity} from "../buldings/building.entity";
 
 @Entity({name: 'user'})
 export class UserEntity {
@@ -21,4 +22,8 @@ export class UserEntity {
         default: EUserRoles.USER
     })
     role: EUserRoles;
+
+
+    @OneToMany(() => BuildingEntity, building => building.user)
+    buildings: BuildingEntity[];
 }
