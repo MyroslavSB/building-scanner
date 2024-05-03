@@ -7,6 +7,9 @@ import {UsersModule} from "../entities/users/users.module";
 import {UserEntity} from "../entities/users/user.entity";
 import {BuildingEntity} from "../entities/buldings/building.entity";
 import {BuildingsModule} from "../entities/buldings/buildings.module";
+import {VisitsModule} from "../entities/visits/visits.module";
+import {VisitEntity} from "../entities/visits/visit.entity";
+import {entities} from "../entities/entities.index";
 
 @Module({
     imports: [
@@ -20,13 +23,14 @@ import {BuildingsModule} from "../entities/buldings/buildings.module";
                 username: configService.get('DB_USERNAME'),
                 password: configService.get('DB_PASSWORD'),
                 database: configService.get('DB_NAME'),
-                entities: [UserEntity, BuildingEntity],
+                entities: entities,
                 synchronize: true,
             }),
             inject: [ConfigService]
         }),
         UsersModule,
-        BuildingsModule
+        BuildingsModule,
+        VisitsModule
     ],
     controllers: [AppController],
     providers: [AppService],

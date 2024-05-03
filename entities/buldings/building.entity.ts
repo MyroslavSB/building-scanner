@@ -3,11 +3,12 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne,
+    ManyToOne, OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
 import {UserEntity} from "../users/user.entity";
+import {VisitEntity} from "../visits/visit.entity";
 
 @Entity({name: 'building'})
 export class BuildingEntity {
@@ -29,13 +30,18 @@ export class BuildingEntity {
     @Column({unique: true, default: null})
     qr_code: string;
 
-    @CreateDateColumn({ name: 'created_at' })
+    @CreateDateColumn({name: 'created_at'})
     createdAt: string;
 
-    @UpdateDateColumn({ name: 'updated_at' })
+    @UpdateDateColumn({name: 'updated_at'})
     updatedAt: string;
 
-    @ManyToOne(() => UserEntity, user => user.buildings) // Assuming UserEntity will have a buildings collection
-    @JoinColumn({ name: 'user_id' })
-    user: UserEntity;
+    // Adding the ManyToOne relationship
+    @ManyToOne(() => UserEntity, user => user.buildings)
+    @JoinColumn({name: 'created_by_user_id'}) // This column will store the reference to UserEntity
+    createdBy: UserEntity;
+
+
+    @OneToMany(() => VisitEntity, visit => visit.building) // Define the reverse relation
+    visits: VisitEntity[];
 }
