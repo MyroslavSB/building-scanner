@@ -11,7 +11,7 @@ export class BuildingsService {
     ) {
     }
 
-    public async createUser(building_body: ICreateBuildingBody): Promise<BuildingEntity> {
+    public async createBuilding(building_body: ICreateBuildingBody): Promise<BuildingEntity> {
         const building = this.buildingRepo.create(building_body)
 
         try {
@@ -27,7 +27,7 @@ export class BuildingsService {
         }
     }
 
-    public async getUsers(): Promise<BuildingEntity[]> {
+    public async getBuildings(): Promise<BuildingEntity[]> {
         return await this.buildingRepo.find()
     }
 }

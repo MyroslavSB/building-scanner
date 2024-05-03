@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import {UserEntity} from "../users/user.entity";
 import {VisitEntity} from "../visits/visit.entity";
+import {MessageEntity} from "../messages/message.entity";
 
 @Entity({name: 'building'})
 export class BuildingEntity {
@@ -44,4 +45,7 @@ export class BuildingEntity {
 
     @OneToMany(() => VisitEntity, visit => visit.building) // Define the reverse relation
     visits: VisitEntity[];
+
+    @OneToMany(() => MessageEntity, message => message.building) // Define the reverse relation
+    messages: MessageEntity[];
 }

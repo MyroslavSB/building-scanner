@@ -12,11 +12,11 @@ export class BuildingsController {
 
     @Post()
     public createUser(@Body() buildingBody: ICreateBuildingBody): Promise<BuildingEntity> {
-        return this.usersService.createUser(buildingBody)
+        return this.usersService.createBuilding(buildingBody)
     }
 
     @Get()
     public getUsers(): Promise<BuildingEntity[]> {
-        return this.usersService.getUsers()
+        return this.usersService.getBuildings()
     }
 }

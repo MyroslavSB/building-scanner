@@ -14,14 +14,24 @@ export class VisitEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @CreateDateColumn({ name: 'visit_date' })
+    @CreateDateColumn({name: 'visit_date'})
     visit_date: string;
 
-    @ManyToOne(() => BuildingEntity, building => building.visits) // Optionally define the reverse relation
-    @JoinColumn({ name: 'building_id' })
+    @ManyToOne(
+        () => BuildingEntity,
+        building => building.visits,
+        {
+            nullable: false
+        }) // Optionally define the reverse relation
+    @JoinColumn({name: 'building_id'})
     building: BuildingEntity;
 
-    @ManyToOne(() => UserEntity, user => user.visits) // Optionally define the reverse relation
-    @JoinColumn({ name: 'user_id' })
+    @ManyToOne(
+        () => UserEntity,
+        user => user.visits,
+        {
+            nullable: false
+        }) // Optionally define the reverse relation
+    @JoinColumn({name: 'user_id'})
     user: UserEntity;
 }
