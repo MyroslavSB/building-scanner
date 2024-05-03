@@ -11,8 +11,8 @@ export class BuildingsController {
     }
 
     @Post()
-    public createUser(@Body() user_body: ICreateBuildingBody): Promise<BuildingEntity> {
-        return this.usersService.createUser(user_body)
+    public createUser(@Body() buildingBody: ICreateBuildingBody): Promise<BuildingEntity> {
+        return this.usersService.createUser(buildingBody)
     }
 
     @Get()

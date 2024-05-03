@@ -26,7 +26,7 @@ export class BuildingEntity {
         longitude: number;
     }
 
-    @Column({unique: true})
+    @Column({unique: true, default: null})
     qr_code: string;
 
     @CreateDateColumn({ name: 'created_at' })
