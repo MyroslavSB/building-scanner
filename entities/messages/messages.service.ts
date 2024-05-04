@@ -14,12 +14,11 @@ export class MessagesService {
     }
 
     public async createMessage(message_body: ICreateMessageBody, user_id: number): Promise<MessageEntity> {
-
         try {
             const message = new MessageEntity();
             message.text = message_body.text;
-            message.building = { id: message_body.building_id } as BuildingEntity; // Set building by ID
-            message.user = { id: user_id } as UserEntity; // Set user by ID
+            message.building = {id: message_body.building_id} as BuildingEntity; // Set building by ID
+            message.user = {id: user_id} as UserEntity; // Set user by ID
             message.created_at = new Date(); // Set created date
 
             return this.messageRepo.save(message);

@@ -24,7 +24,7 @@ export class UserEntity {
         default: EUserRoles.USER
     })
     role: EUserRoles;
-
+    
     // Adding OneToMany relationship
     @OneToMany(() => BuildingEntity, building => building.createdBy)
     buildings: BuildingEntity[];
