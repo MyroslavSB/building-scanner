@@ -6,17 +6,21 @@ import {BuildingsModule} from "./buldings/buildings.module";
 import {MessagesModule} from "./messages/messages.module";
 import {UsersModule} from "./users/users.module";
 import {VisitsModule} from "./visits/visits.module";
+import {AchievementsModule} from "./achievements/achievements.module";
+import {AchievementEntity} from "./achievements/achievement.entity";
 
 export const entities = [
-    UserEntity,
     BuildingEntity,
+    MessageEntity,
+    UserEntity,
     VisitEntity,
-    MessageEntity
+    AchievementEntity
 ];
 
 export const modules = [
     BuildingsModule,
     MessagesModule,
     UsersModule,
-    VisitsModule
+    VisitsModule,
+    AchievementsModule
 ];

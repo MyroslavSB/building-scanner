@@ -3,6 +3,7 @@ import {EUserRoles} from "./utils/enums/e-user-roles";
 import {BuildingEntity} from "../buldings/building.entity";
 import {VisitEntity} from "../visits/visit.entity";
 import {MessageEntity} from "../messages/message.entity";
+import {AchievementEntity} from "../achievements/achievement.entity";
 
 @Entity({name: 'user'})
 export class UserEntity {
@@ -24,7 +25,7 @@ export class UserEntity {
         default: EUserRoles.USER
     })
     role: EUserRoles;
-    
+
     // Adding OneToMany relationship
     @OneToMany(() => BuildingEntity, building => building.createdBy)
     buildings: BuildingEntity[];
@@ -34,4 +35,10 @@ export class UserEntity {
 
     @OneToMany(() => MessageEntity, message => message.building) // Define the reverse relation
     messages: MessageEntity[];
+
+    @OneToMany(
+        () => AchievementEntity,
+        achievement => achievement.user
+    )
+    achievements: AchievementEntity[];
 }

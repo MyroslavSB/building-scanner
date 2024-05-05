@@ -2,12 +2,13 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne,
+    ManyToOne, OneToMany, OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
 
 import {UserEntity} from "../users/user.entity";
 import {BuildingEntity} from "../buldings/building.entity";
+import {AchievementEntity} from "../achievements/achievement.entity";
 
 @Entity({name: 'visit'})
 export class VisitEntity {
@@ -34,4 +35,10 @@ export class VisitEntity {
         }) // Optionally define the reverse relation
     @JoinColumn({name: 'user_id'})
     user: UserEntity;
+
+    @OneToOne(
+        () => AchievementEntity,
+        (achievement) => achievement.visit,
+    )
+    achievement: AchievementEntity;
 }

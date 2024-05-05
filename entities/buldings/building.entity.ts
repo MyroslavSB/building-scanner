@@ -39,7 +39,7 @@ export class BuildingEntity {
 
     // Adding the ManyToOne relationship
     @ManyToOne(() => UserEntity, user => user.buildings)
-    @JoinColumn({name: 'created_by_user_id'}) // This column will store the reference to UserEntity
+    @JoinColumn({name: 'user_id'}) // This column will store the reference to UserEntity
     createdBy: UserEntity;
 
 

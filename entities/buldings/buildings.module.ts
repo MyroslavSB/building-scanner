@@ -9,7 +9,8 @@ import {BuildingsService} from "./buildings.service";
         TypeOrmModule.forFeature([BuildingEntity])
     ],
     controllers: [BuildingsController],
-    providers: [BuildingsService]
+    providers: [BuildingsService],
+    exports: [BuildingsService]
 })
 export class BuildingsModule {
 

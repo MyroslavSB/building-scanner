@@ -11,12 +11,12 @@ export class VisitsController {
     }
 
     @Post()
-    public createUser(@Body() buildingBody: ICreateVisitBody): Promise<VisitEntity> {
-        return this.visitsService.createUser(buildingBody, 1)
+    public makeVisit(@Body() buildingBody: ICreateVisitBody): Promise<VisitEntity> {
+        return this.visitsService.createVisit(buildingBody, 1)
     }
 
     @Get()
-    public getUsers(): Promise<VisitEntity[]> {
+    public getVisits(): Promise<VisitEntity[]> {
         return this.visitsService.getVisits()
     }
 }

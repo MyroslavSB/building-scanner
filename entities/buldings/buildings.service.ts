@@ -27,6 +27,12 @@ export class BuildingsService {
         }
     }
 
+    public getBuildingById(building_id: number): Promise<BuildingEntity> {
+        return this.buildingRepo.findOneBy({
+            id: building_id
+        })
+    }
+
     public async getBuildings(): Promise<BuildingEntity[]> {
         return await this.buildingRepo.find()
     }
