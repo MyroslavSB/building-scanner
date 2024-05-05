@@ -3,11 +3,7 @@ import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {ConfigModule, ConfigService} from "@nestjs/config";
-import {UsersModule} from "../entities/users/users.module";
-import {BuildingsModule} from "../entities/buldings/buildings.module";
-import {VisitsModule} from "../entities/visits/visits.module";
-import {entities, modules} from "../entities/entities.index";
-import {MessagesModule} from "../entities/messages/messages.module";
+import {entities, modules} from "./entities/entities.index";
 
 @Module({
     imports: [

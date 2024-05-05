@@ -21,9 +21,7 @@ export class AchievementsService {
             visit: {id: visit.id}
         });
 
-
         return await this.achievementRepo.save(achievement);
-
 
     }
 
