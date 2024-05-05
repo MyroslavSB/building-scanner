@@ -3,8 +3,11 @@ import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {ConfigModule, ConfigService} from "@nestjs/config";
-import {UsersModule} from "../users/users.module";
-import {UserEntity} from "../users/user.entity";
+import {UsersModule} from "../entities/users/users.module";
+import {BuildingsModule} from "../entities/buldings/buildings.module";
+import {VisitsModule} from "../entities/visits/visits.module";
+import {entities, modules} from "../entities/entities.index";
+import {MessagesModule} from "../entities/messages/messages.module";
 
 @Module({
     imports: [
@@ -18,12 +21,12 @@ import {UserEntity} from "../users/user.entity";
                 username: configService.get('DB_USERNAME'),
                 password: configService.get('DB_PASSWORD'),
                 database: configService.get('DB_NAME'),
-                entities: [UserEntity],
+                entities: entities,
                 synchronize: true,
             }),
             inject: [ConfigService]
         }),
-        UsersModule
+        ...modules
     ],
     controllers: [AppController],
     providers: [AppService],
