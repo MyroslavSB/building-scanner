@@ -25,37 +25,32 @@ export class VisitsService {
             throw new HttpException('Such building doesn\'t exist', HttpStatus.BAD_REQUEST);
         }
 
-        const visit = this.visitRepo.create({
-            building: { id: visit_body.building_id },
-            user: { id: userId },
-            visit_date: new Date().toISOString(), // or use another method to set the date appropriately
-        });
-
         const previousVisit: VisitEntity = await this.visitRepo.findOneBy({
             building: {id: visit_body.building_id},
             user: {id: userId}
         });
 
+        const visit = this.visitRepo.create({
+            building: {id: visit_body.building_id},
+            user: {id: userId},
+            visit_date: new Date().toISOString(), // or use another method to set the date appropriately
+        });
+
         if (!previousVisit) {
+            const saved = await this.visitRepo.save(visit);
+
             await this.achievementsService.createAchievement(
                 userId,
                 'building.name',
-                visit.visit_date,
-                visit.id
+                visit
             )
+
+            return saved
         }
 
-        try {
-            return await this.visitRepo.save(visit);
-        } catch (error) {
-            // Check the error type to see if it is a duplicate entry
-            if (error.code === 'ER_DUP_ENTRY' || error.driverError?.code === 'ER_DUP_ENTRY') {
-                // You can customize the error message as needed
-                throw new HttpException('This email is already registered.', HttpStatus.BAD_REQUEST);
-            }
-            // Rethrow the error if it's not related to duplicate entry
-            throw error;
-        }
+        return this.visitRepo.save(visit)
+
+
     }
 
     public async getVisits(): Promise<VisitEntity[]> {
