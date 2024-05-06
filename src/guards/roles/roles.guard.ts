@@ -3,6 +3,9 @@ import {UsersService} from "../../modules/users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import {EUserRoles} from "../../modules/users/utils/enums/e-user-roles";
 import {Reflector} from "@nestjs/core";
+import {extractTokenFromHeader} from "../../shared/utils/functions/extract-token-from-header";
+import {jwtConstants} from "../../shared/utils/constants/jwt-constants";
+import {ROLES_KEY} from "../../shared/decorators/roles.decorator";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -14,7 +17,7 @@ export class RolesGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // Get the roles specified in the decorator
-    const requiredRoles: EUserRoles[] = this.reflector.getAllAndOverride<EUserRoles[]>('roles', [
+    const requiredRoles: EUserRoles[] = this.reflector.getAllAndOverride<EUserRoles[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -25,19 +28,22 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const authHeader = request.headers['authorization'];
 
-    // Check for "Bearer " token in Authorization header
-    if (!authHeader || !authHeader.startsWith('JWT ')) {
-      throw new UnauthorizedException('Authorization header missing or malformed');
+    const token: string = extractTokenFromHeader(request);
+
+    if (!token) {
+      throw new UnauthorizedException('No token bruh');
+
     }
-
-    // Extract the token from the header
-    const token = authHeader.substring(7);
-
     try {
       // Verify and decode the token
-      const payload = this.jwtService.verify(token);
+      const payload = await this.jwtService.verifyAsync(
+          token,
+          {
+            secret: jwtConstants.secret
+          }
+      );
+
       const userId = payload.sub;
 
       // Fetch the user from the database

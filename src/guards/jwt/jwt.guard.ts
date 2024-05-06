@@ -16,8 +16,6 @@ export class JwtGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    // Extract the token after the "JWT " prefix
-
     try {
       const payload = await this.jwtService.verifyAsync(
           token,

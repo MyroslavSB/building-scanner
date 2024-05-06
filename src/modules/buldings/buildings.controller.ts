@@ -16,7 +16,7 @@ export class BuildingsController {
     ) {
     }
 
-    @Roles(EUserRoles.ADMIN)
+    @UseGuards(JwtGuard)
     @Post()
     public createBuilding(@Body() buildingBody: ICreateBuildingBody): Promise<BuildingEntity> {
         return this.buildingsService.createBuilding(buildingBody)

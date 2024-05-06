@@ -32,7 +32,7 @@ import {JwtGuard} from "./guards/jwt/jwt.guard";
         JwtModule.register({
             global: true,
             secret: jwtConstants.secret,
-            signOptions: { expiresIn: '1h' },
+            signOptions: { expiresIn: '2h' },
         }),
     ],
     controllers: [AppController, AuthController],
