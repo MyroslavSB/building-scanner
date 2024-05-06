@@ -32,16 +32,15 @@ export class BuildingEntity {
     qr_code: string;
 
     @CreateDateColumn({name: 'created_at'})
-    createdAt: string;
+    created_at: string;
 
     @UpdateDateColumn({name: 'updated_at'})
-    updatedAt: string;
+    updated_at: string;
 
     // Adding the ManyToOne relationship
     @ManyToOne(() => UserEntity, user => user.buildings)
     @JoinColumn({name: 'user_id'}) // This column will store the reference to UserEntity
-    createdBy: UserEntity;
-
+    created_by: UserEntity;
 
     @OneToMany(() => VisitEntity, visit => visit.building) // Define the reverse relation
     visits: VisitEntity[];

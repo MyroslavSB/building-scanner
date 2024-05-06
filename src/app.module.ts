@@ -7,7 +7,9 @@ import {entities, modules} from "./modules/modules.index";
 import { AuthController } from './modules/auth/auth.controller';
 import {AuthService} from "./modules/auth/auth.service";
 import {JwtModule} from "@nestjs/jwt";
-import {jwtConstants} from "./shared/constants/jwt-constants";
+import {jwtConstants} from "./shared/utils/constants/jwt-constants";
+import {RolesGuard} from "./guards/roles/roles.guard";
+import {JwtGuard} from "./guards/jwt/jwt.guard";
 
 @Module({
     imports: [
@@ -30,11 +32,11 @@ import {jwtConstants} from "./shared/constants/jwt-constants";
         JwtModule.register({
             global: true,
             secret: jwtConstants.secret,
-            signOptions: { expiresIn: '60s' },
+            signOptions: { expiresIn: '1h' },
         }),
     ],
     controllers: [AppController, AuthController],
-    providers: [AppService, AuthService],
+    providers: [AppService, RolesGuard, JwtGuard],
 })
 export class AppModule {
 }

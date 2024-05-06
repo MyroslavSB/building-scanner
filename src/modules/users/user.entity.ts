@@ -26,8 +26,7 @@ export class UserEntity {
     })
     role: EUserRoles;
 
-    // Adding OneToMany relationship
-    @OneToMany(() => BuildingEntity, building => building.createdBy)
+    @OneToMany(() => BuildingEntity, building => building.created_by)
     buildings: BuildingEntity[];
 
     @OneToMany(() => VisitEntity, visit => visit.user) // Define the reverse relation

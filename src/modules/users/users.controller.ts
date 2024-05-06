@@ -10,11 +10,6 @@ export class UsersController {
     ) {
     }
 
-    @Post('register')
-    async register(@Body() registerUserDto: RegisterUserDto) {
-        return this.usersService.registerUser(registerUserDto);
-    }
-
     @Get()
     public getUsers(): Promise<UserEntity[]> {
         return this.usersService.getUsers()

@@ -49,10 +49,10 @@ export class UsersService {
 
     public async validateUser(username: string, password: string): Promise<UserEntity> {
         const user = await this.userRepo.findOneBy({
-            username
+            username: username
         })
 
-        if (!user || user.password !== await bcrypt.hash(password, 10)) {
+        if (!user || user.password !== password) {
             throw new UnauthorizedException('Invalid credentials');
         }
 
@@ -65,5 +65,9 @@ export class UsersService {
 
     public findByUsername(username: string): Promise<UserEntity> {
         return this.userRepo.findOneBy({ username });
+    }
+
+    public findById(id: number): Promise<UserEntity> {
+        return this.userRepo.findOneBy({id})
     }
 }
