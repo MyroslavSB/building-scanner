@@ -1,6 +1,6 @@
 import {UsersService} from "./users.service";
 import {UserEntity} from "./user.entity";
-import {ICreateUserBody} from "./utils/interfaces/i-create-user-body";
+import {RegisterUserDto} from "./utils/interfaces/register-user-dto";
 import {Body, Controller, Get, Post} from "@nestjs/common";
 
 @Controller('users')
@@ -10,9 +10,9 @@ export class UsersController {
     ) {
     }
 
-    @Post()
-    public createUser(@Body() user_body: ICreateUserBody): Promise<UserEntity> {
-        return this.usersService.createUser(user_body)
+    @Post('register')
+    async register(@Body() registerUserDto: RegisterUserDto) {
+        return this.usersService.registerUser(registerUserDto);
     }
 
     @Get()

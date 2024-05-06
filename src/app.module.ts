@@ -3,7 +3,11 @@ import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {ConfigModule, ConfigService} from "@nestjs/config";
-import {entities, modules} from "./entities/entities.index";
+import {entities, modules} from "./modules/modules.index";
+import { AuthController } from './modules/auth/auth.controller';
+import {AuthService} from "./modules/auth/auth.service";
+import {JwtModule} from "@nestjs/jwt";
+import {jwtConstants} from "./shared/constants/jwt-constants";
 
 @Module({
     imports: [
@@ -22,10 +26,15 @@ import {entities, modules} from "./entities/entities.index";
             }),
             inject: [ConfigService]
         }),
-        ...modules
+        ...modules,
+        JwtModule.register({
+            global: true,
+            secret: jwtConstants.secret,
+            signOptions: { expiresIn: '60s' },
+        }),
     ],
-    controllers: [AppController],
-    providers: [AppService],
+    controllers: [AppController, AuthController],
+    providers: [AppService, AuthService],
 })
 export class AppModule {
 }

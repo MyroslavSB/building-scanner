@@ -1,7 +1,8 @@
 import {BuildingsService} from "./buildings.service";
 import {BuildingEntity} from "./building.entity";
 import {ICreateBuildingBody} from "./utils/interfaces/i-create-building-body";
-import {Body, Controller, Get, Post} from "@nestjs/common";
+import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
+import {AuthGuard} from "@nestjs/passport";
 
 @Controller('buildings')
 export class BuildingsController {
@@ -10,13 +11,14 @@ export class BuildingsController {
     ) {
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Post()
-    public createUser(@Body() buildingBody: ICreateBuildingBody): Promise<BuildingEntity> {
+    public createBuilding(@Body() buildingBody: ICreateBuildingBody): Promise<BuildingEntity> {
         return this.usersService.createBuilding(buildingBody)
     }
 
     @Get()
-    public getUsers(): Promise<BuildingEntity[]> {
+    public getBuildings(): Promise<BuildingEntity[]> {
         return this.usersService.getBuildings()
     }
 }
