@@ -7,7 +7,9 @@ import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {RolesGuard} from "../../guards/roles/roles.guard";
 import {Roles} from "../../shared/decorators/roles.decorator";
 import {EUserRoles} from "../users/utils/enums/e-user-roles";
+import {ApiTags} from "@nestjs/swagger";
 
+@ApiTags('buildings')
 @Controller('buildings')
 @UseGuards(RolesGuard)
 export class BuildingsController {

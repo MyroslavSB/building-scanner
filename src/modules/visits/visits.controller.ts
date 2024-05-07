@@ -2,7 +2,9 @@ import {VisitsService} from "./visits.service";
 import {VisitEntity} from "./visit.entity";
 import {ICreateVisitBody} from "./utils/interfaces/i-create-visit-body";
 import {Body, Controller, Get, Post} from "@nestjs/common";
+import {ApiTags} from "@nestjs/swagger";
 
+@ApiTags('visits')
 @Controller('visits')
 export class VisitsController {
     constructor(

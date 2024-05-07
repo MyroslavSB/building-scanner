@@ -5,7 +5,9 @@ import {AuthGuard} from "@nestjs/passport";
 import {UserEntity} from "../users/user.entity";
 import {RegisterUserDto} from "../users/utils/dtos/register-user-dto";
 import {UserLoginDto} from "../users/utils/dtos/user-login-dto";
+import {ApiTags} from "@nestjs/swagger";
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -22,7 +24,9 @@ export class AuthController {
 
     @Post('register')
     async register(@Body() registerUserDto: RegisterUserDto) {
-        return this.usersService.registerUser(registerUserDto);
+        const registered_user: UserEntity = await this.usersService.registerUser(registerUserDto);
+
+        return this.authService.login(registered_user);
     }
 
 }

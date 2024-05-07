@@ -47,12 +47,14 @@ export class UsersService {
         }
     }
 
-    public async validateUser(username: string, password: string): Promise<UserEntity> {
+    public async validateUser(login_field: string, password: string): Promise<UserEntity> {
         const user = await this.userRepo.findOneBy({
-            username: username
-        })
+            username: login_field
+        }) || await this.userRepo.findOneBy({email: login_field})
 
-        if (!user || user.password !== password) {
+        const samePassword: boolean = await bcrypt.compare(password, user.password)
+
+        if (!user || !samePassword) {
             throw new UnauthorizedException('Invalid credentials');
         }
 
