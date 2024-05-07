@@ -1,7 +1,6 @@
-import {Body, Controller, Get, Post, Request, UseGuards} from '@nestjs/common';
+import {Body, Controller, Post,} from '@nestjs/common';
 import {AuthService} from "./auth.service";
 import {UsersService} from "../users/users.service";
-import {AuthGuard} from "@nestjs/passport";
 import {UserEntity} from "../users/user.entity";
 import {RegisterUserDto} from "../users/utils/dtos/register-user-dto";
 import {UserLoginDto} from "../users/utils/dtos/user-login-dto";

@@ -1,7 +1,6 @@
 import {MessagesService} from "./messages.service";
 import {MessageEntity} from "./message.entity";
-import {ICreateMessageBody} from "./utils/interfaces/i-create-message-body";
-import {Body, Controller, Get, Post, UsePipes, ValidationPipe} from "@nestjs/common";
+import {Body, Controller, Get, Post} from "@nestjs/common";
 import {CreateMessageDto} from "./utils/dto/create-message-dto";
 import {ApiTags} from "@nestjs/swagger";
 
