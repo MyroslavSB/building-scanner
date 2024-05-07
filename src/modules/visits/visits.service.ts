@@ -2,7 +2,7 @@ import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {VisitEntity} from "./visit.entity";
 import {Repository} from "typeorm";
-import {ICreateVisitBody} from "./utils/interfaces/i-create-visit-body";
+import {VisitBuildingDto} from "./utils/interfaces/visit-building-dto";
 import {AchievementEntity} from "../achievements/achievement.entity";
 import {BuildingEntity} from "../buldings/building.entity";
 import {AchievementsService} from "../achievements/achievements.service";
@@ -18,7 +18,7 @@ export class VisitsService {
     ) {
     }
 
-    public async createVisit(visit_body: ICreateVisitBody, userId: number): Promise<VisitEntity> {
+    public async createVisit(visit_body: VisitBuildingDto, userId: number): Promise<VisitEntity> {
         const building: BuildingEntity = await this.buildingsService.getBuildingById(visit_body.building_id)
 
         if (!building) {

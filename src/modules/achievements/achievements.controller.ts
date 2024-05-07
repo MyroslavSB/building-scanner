@@ -1,7 +1,8 @@
 import {AchievementsService} from "./achievements.service";
 import {AchievementEntity} from "./achievement.entity";
-import {Controller, Get} from "@nestjs/common";
+import {Controller, Get, UseGuards} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
+import {JwtGuard} from "../../guards/jwt/jwt.guard";
 
 @ApiTags('achievements')
 @Controller('achievements')
@@ -11,8 +12,9 @@ export class AchievementsController {
     ) {
     }
 
+    @UseGuards(JwtGuard)
     @Get()
     public getUsers(): Promise<AchievementEntity[]> {
-        return this.achievementsService.getVisits()
+        return this.achievementsService.getAchievements()
     }
 }

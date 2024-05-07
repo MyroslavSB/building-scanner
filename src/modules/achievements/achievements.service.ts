@@ -25,7 +25,7 @@ export class AchievementsService {
 
     }
 
-    public async getVisits(): Promise<AchievementEntity[]> {
+    public async getAchievements(): Promise<AchievementEntity[]> {
         return await this.achievementRepo.find()
     }
 }

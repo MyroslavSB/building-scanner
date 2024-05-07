@@ -1,8 +1,10 @@
 import {VisitsService} from "./visits.service";
 import {VisitEntity} from "./visit.entity";
-import {ICreateVisitBody} from "./utils/interfaces/i-create-visit-body";
-import {Body, Controller, Get, Post} from "@nestjs/common";
+import {VisitBuildingDto} from "./utils/interfaces/visit-building-dto";
+import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
+import {JwtGuard} from "../../guards/jwt/jwt.guard";
+import {RolesGuard} from "../../guards/roles/roles.guard";
 
 @ApiTags('visits')
 @Controller('visits')
@@ -12,11 +14,13 @@ export class VisitsController {
     ) {
     }
 
+    @UseGuards(JwtGuard)
     @Post()
-    public makeVisit(@Body() buildingBody: ICreateVisitBody): Promise<VisitEntity> {
-        return this.visitsService.createVisit(buildingBody, 1)
+    public makeVisit(@Body() visitBuildingDto: VisitBuildingDto): Promise<VisitEntity> {
+        return this.visitsService.createVisit(visitBuildingDto, 1)
     }
 
+    @UseGuards(JwtGuard)
     @Get()
     public getVisits(): Promise<VisitEntity[]> {
         return this.visitsService.getVisits()
