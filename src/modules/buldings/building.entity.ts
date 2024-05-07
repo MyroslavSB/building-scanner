@@ -16,7 +16,9 @@ export class BuildingEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({
+        unique: true
+    })
     name: string;
 
     @Column()
@@ -37,7 +39,7 @@ export class BuildingEntity {
     @UpdateDateColumn({name: 'updated_at'})
     updated_at: string;
 
-    // Adding the ManyToOne relationship
+
     @ManyToOne(() => UserEntity, user => user.buildings)
     @JoinColumn({name: 'user_id'}) // This column will store the reference to UserEntity
     created_by: UserEntity;

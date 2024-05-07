@@ -8,49 +8,45 @@ import {ROLES_KEY} from "../../shared/decorators/roles.decorator";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(
-      private readonly reflector: Reflector,
-      private readonly jwtService: JwtService,
-  ) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Get the roles specified in the decorator
-    const requiredRoles: EUserRoles[] = this.reflector.getAllAndOverride<EUserRoles[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    // If no specific roles are required, grant access
-    if (!requiredRoles) {
-      return true;
+    constructor(
+        private readonly reflector: Reflector,
+        private readonly jwtService: JwtService,
+    ) {
     }
 
-    const request = context.switchToHttp().getRequest();
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        // Get the roles specified in the decorator
+        const requiredRoles: EUserRoles[] = this.reflector.getAllAndOverride<EUserRoles[]>(ROLES_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ]);
 
-    const token: string = extractTokenFromHeader(request);
+        // If no specific roles are required, grant access
+        if (!requiredRoles) {
+            return true;
+        }
 
-    if (!token) {
-      throw new UnauthorizedException('No token RolesGuard');
+        const request = context.switchToHttp().getRequest();
+
+        const token: string = extractTokenFromHeader(request);
+
+        if (!token) {
+            throw new UnauthorizedException('No token RolesGuard');
+        }
+
+        const user = request.user
+
+        if (!request.user) {
+            throw new UnauthorizedException('No User in request body: RolesGuard');
+        }
+
+        if (!requiredRoles.includes(user.role)) {
+            throw new UnauthorizedException('Access denied: insufficient permissions');
+
+        }
+
+        return true;
+
 
     }
-    try {
-      const payload = await this.jwtService.verifyAsync(
-          token,
-          {
-            secret: jwtConstants.secret
-          }
-      );
-
-      const user = request.user
-
-      if (!requiredRoles.includes(user.role)) {
-        throw new ForbiddenException('Access denied: insufficient permissions');
-      }
-
-      return true;
-
-    } catch (err) {
-      throw new UnauthorizedException('Invalid or expired token: RolesGuard');
-    }
-  }
 }

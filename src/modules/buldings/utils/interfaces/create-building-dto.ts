@@ -1,5 +1,6 @@
 import {ApiProperty} from "@nestjs/swagger";
-import {IsEmail, IsNotEmpty, IsNumber, IsString} from "class-validator";
+import {IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested} from "class-validator";
+import {Type} from "class-transformer";
 
 class BuildingLocation {
     @ApiProperty({
@@ -38,9 +39,11 @@ export class CreateBuildingDto {
     description: string;
 
     @ApiProperty({
-        type: () => BuildingLocation,
         description: 'Building location'
     })
-    location: BuildingLocation;
+    @Type(() => BuildingLocation)
+    @ValidateNested()
+    @IsOptional()
+    location?: BuildingLocation;
 }
 

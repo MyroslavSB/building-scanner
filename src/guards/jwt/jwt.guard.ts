@@ -30,9 +30,8 @@ export class JwtGuard implements CanActivate {
             );
 
             const userId = payload.sub;
-            console.log(userId)
             request.user = await this.usersService.findById(userId);
-            return true;
+
         } catch (err) {
             // Handle invalid or expired tokens
             throw new UnauthorizedException('Invalid or expired token: JwtGuard');

@@ -37,12 +37,10 @@ export class UsersService {
         try {
             return await this.userRepo.save(newUser);
         } catch (error) {
-            // Check the error type to see if it is a duplicate entry
             if (error.code === 'ER_DUP_ENTRY' || error.driverError?.code === 'ER_DUP_ENTRY') {
-                // You can customize the error message as needed
                 throw new HttpException('This email is already registered.', HttpStatus.BAD_REQUEST);
             }
-            // Rethrow the error if it's not related to duplicate entry
+
             throw error;
         }
     }
