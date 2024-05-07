@@ -6,6 +6,7 @@ import {ApiTags} from "@nestjs/swagger";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 
 @ApiTags('messages')
+@UseGuards(JwtGuard)
 @Controller('messages')
 export class MessagesController {
     constructor(
@@ -13,13 +14,11 @@ export class MessagesController {
     ) {
     }
 
-    @UseGuards(JwtGuard)
     @Post()
     async createMessage(@Body() createMessageDto: CreateMessageDto): Promise<MessageEntity> {
         return this.messagesService.createMessage(createMessageDto, 1);
     }
 
-    @UseGuards(JwtGuard)
     @Get()
     public getUsers(): Promise<MessageEntity[]> {
         return this.messagesService.getMessages()

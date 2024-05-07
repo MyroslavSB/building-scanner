@@ -4,7 +4,6 @@ import {VisitBuildingDto} from "./utils/interfaces/visit-building-dto";
 import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
-import {RolesGuard} from "../../guards/roles/roles.guard";
 
 @ApiTags('visits')
 @Controller('visits')

@@ -4,8 +4,6 @@ import {AppService} from './app.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {entities, modules} from "./modules/modules.index";
-import { AuthController } from './modules/auth/auth.controller';
-import {AuthService} from "./modules/auth/auth.service";
 import {JwtModule} from "@nestjs/jwt";
 import {jwtConstants} from "./shared/utils/constants/jwt-constants";
 import {RolesGuard} from "./guards/roles/roles.guard";
@@ -35,7 +33,7 @@ import {JwtGuard} from "./guards/jwt/jwt.guard";
             signOptions: { expiresIn: '2h' },
         }),
     ],
-    controllers: [AppController, AuthController],
+    controllers: [AppController],
     providers: [AppService, RolesGuard, JwtGuard],
 })
 export class AppModule {

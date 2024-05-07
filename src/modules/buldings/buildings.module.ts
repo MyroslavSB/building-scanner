@@ -5,6 +5,7 @@ import {BuildingsController} from "./buildings.controller";
 import {BuildingsService} from "./buildings.service";
 import {UsersModule} from "../users/users.module";
 
+
 @Module({
     imports: [
         TypeOrmModule.forFeature([BuildingEntity]),

@@ -2,33 +2,43 @@ import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '
 import {JwtService} from "@nestjs/jwt";
 import {jwtConstants} from "../../shared/utils/constants/jwt-constants";
 import {extractTokenFromHeader} from "../../shared/utils/functions/extract-token-from-header";
+import {UsersService} from "../../modules/users/users.service";
 
 @Injectable()
 export class JwtGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-
-    const token: string = extractTokenFromHeader(request);
-
-    if (!token) {
-      throw new UnauthorizedException();
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly usersService: UsersService
+    ) {
     }
 
-    try {
-      const payload = await this.jwtService.verifyAsync(
-          token,
-          {
-            secret: jwtConstants.secret
-          }
-      );
-    } catch (err) {
-      // Handle invalid or expired tokens
-      throw new UnauthorizedException('Invalid or expired token');
-    }
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const request = context.switchToHttp().getRequest();
 
-    return true
-  }
+        const token: string = extractTokenFromHeader(request);
+
+        if (!token) {
+            throw new UnauthorizedException();
+        }
+
+        try {
+            const payload = await this.jwtService.verifyAsync(
+                token,
+                {
+                    secret: jwtConstants.secret
+                }
+            );
+
+            const userId = payload.sub;
+            console.log(userId)
+            request.user = await this.usersService.findById(userId);
+            return true;
+        } catch (err) {
+            // Handle invalid or expired tokens
+            throw new UnauthorizedException('Invalid or expired token: JwtGuard');
+        }
+
+        return true;
+    }
 
 }

@@ -1,5 +1,4 @@
 import {CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException} from '@nestjs/common';
-import {UsersService} from "../../modules/users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import {EUserRoles} from "../../modules/users/utils/enums/e-user-roles";
 import {Reflector} from "@nestjs/core";
@@ -12,7 +11,6 @@ export class RolesGuard implements CanActivate {
   constructor(
       private readonly reflector: Reflector,
       private readonly jwtService: JwtService,
-      private readonly usersService: UsersService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -32,11 +30,10 @@ export class RolesGuard implements CanActivate {
     const token: string = extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('No token bruh');
+      throw new UnauthorizedException('No token RolesGuard');
 
     }
     try {
-      // Verify and decode the token
       const payload = await this.jwtService.verifyAsync(
           token,
           {
@@ -44,15 +41,8 @@ export class RolesGuard implements CanActivate {
           }
       );
 
-      const userId = payload.sub;
+      const user = request.user
 
-      // Fetch the user from the database
-      const user = await this.usersService.findById(userId);
-
-      // Attach the user to the request object for further use
-      request.user = user;
-
-      // Check if the user has any of the required roles
       if (!requiredRoles.includes(user.role)) {
         throw new ForbiddenException('Access denied: insufficient permissions');
       }
@@ -60,7 +50,7 @@ export class RolesGuard implements CanActivate {
       return true;
 
     } catch (err) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException('Invalid or expired token: RolesGuard');
     }
   }
 }

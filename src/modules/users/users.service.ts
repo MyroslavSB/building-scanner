@@ -47,10 +47,10 @@ export class UsersService {
         }
     }
 
-    public async validateUser(login_field: string, password: string): Promise<UserEntity> {
+    public async validateUser(username: string, password: string): Promise<UserEntity> {
         const user = await this.userRepo.findOneBy({
-            username: login_field
-        }) || await this.userRepo.findOneBy({email: login_field})
+            username: username
+        })
 
         const samePassword: boolean = await bcrypt.compare(password, user.password)
 

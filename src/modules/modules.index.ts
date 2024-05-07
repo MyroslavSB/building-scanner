@@ -19,10 +19,10 @@ export const entities = [
 ];
 
 export const modules = [
+    AchievementsModule,
+    AuthModule,
     BuildingsModule,
     MessagesModule,
     UsersModule,
-    VisitsModule,
-    AchievementsModule,
-    AuthModule
+    VisitsModule
 ];

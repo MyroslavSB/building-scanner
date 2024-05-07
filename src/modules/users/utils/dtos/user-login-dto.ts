@@ -6,7 +6,7 @@ export class UserLoginDto {
         default: 'hello@world.com',
         required: true
     })
-    @IsEmail()
+    @IsString()
     @IsNotEmpty()
     username: string;
 
