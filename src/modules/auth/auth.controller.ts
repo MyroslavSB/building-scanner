@@ -3,7 +3,8 @@ import {AuthService} from "./auth.service";
 import {UsersService} from "../users/users.service";
 import {AuthGuard} from "@nestjs/passport";
 import {UserEntity} from "../users/user.entity";
-import {RegisterUserDto} from "../users/utils/interfaces/register-user-dto";
+import {RegisterUserDto} from "../users/utils/dtos/register-user-dto";
+import {UserLoginDto} from "../users/utils/dtos/user-login-dto";
 
 @Controller('auth')
 export class AuthController {
@@ -14,8 +15,8 @@ export class AuthController {
     }
 
     @Post('login')
-    async login(@Body('username') username: string, @Body('password') password: string) {
-        const user = await this.usersService.validateUser(username, password);
+    async login(@Body() user_login: UserLoginDto) {
+        const user = await this.usersService.validateUser(user_login.username, user_login.password);
         return this.authService.login(user);
     }
 

@@ -2,7 +2,7 @@ import {BadRequestException, HttpException, HttpStatus, Injectable, Unauthorized
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
 import {Repository} from "typeorm";
-import {RegisterUserDto} from "./utils/interfaces/register-user-dto";
+import {RegisterUserDto} from "./utils/dtos/register-user-dto";
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
