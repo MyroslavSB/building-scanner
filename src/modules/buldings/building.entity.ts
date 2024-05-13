@@ -41,12 +41,12 @@ export class BuildingEntity {
 
 
     @ManyToOne(() => UserEntity, user => user.buildings)
-    @JoinColumn({name: 'user_id'}) // This column will store the reference to UserEntity
+    @JoinColumn({name: 'user_id'})
     created_by: UserEntity;
 
-    @OneToMany(() => VisitEntity, visit => visit.building) // Define the reverse relation
+    @OneToMany(() => VisitEntity, visit => visit.building)
     visits: VisitEntity[];
 
-    @OneToMany(() => MessageEntity, message => message.building) // Define the reverse relation
+    @OneToMany(() => MessageEntity, message => message.building)
     messages: MessageEntity[];
 }

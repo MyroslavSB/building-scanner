@@ -15,7 +15,7 @@ export class BuildingsService {
     public async createBuilding(building_body: CreateBuildingDto): Promise<BuildingEntity> {
         const building = this.buildingRepo.create(building_body)
 
-        const created_building = this.getBuildingByName(building.name)
+        const created_building = await this.getBuildingByName(building.name)
 
         if (created_building) {
             throw new HttpException('Building with such name has already been registered', HttpStatus.BAD_REQUEST);
@@ -35,7 +35,7 @@ export class BuildingsService {
         })
     }
 
-    public getBuildingByName(building_name: string): Promise<BuildingEntity> {
+    public async getBuildingByName(building_name: string): Promise<BuildingEntity> {
         return this.buildingRepo.findOneBy({
             name: building_name
         })

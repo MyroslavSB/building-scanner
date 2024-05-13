@@ -29,10 +29,10 @@ export class UserEntity {
     @OneToMany(() => BuildingEntity, building => building.created_by)
     buildings: BuildingEntity[];
 
-    @OneToMany(() => VisitEntity, visit => visit.user) // Define the reverse relation
+    @OneToMany(() => VisitEntity, visit => visit.user)
     visits: VisitEntity[];
 
-    @OneToMany(() => MessageEntity, message => message.building) // Define the reverse relation
+    @OneToMany(() => MessageEntity, message => message.building)
     messages: MessageEntity[];
 
     @OneToMany(
