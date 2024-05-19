@@ -23,7 +23,7 @@ class BuildingLocation {
 export class CreateBuildingDto {
 
     @ApiProperty({
-        default: 'Some building same',
+        default: 'Some building name',
         required: true
     })
     @IsString()

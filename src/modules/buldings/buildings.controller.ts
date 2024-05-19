@@ -1,7 +1,7 @@
 import {BuildingsService} from "./buildings.service";
 import {BuildingEntity} from "./building.entity";
 import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
-import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Post, Put, Patch, Delete, UseGuards, Param} from "@nestjs/common";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {RolesGuard} from "../../guards/roles/roles.guard";
 import {ApiTags} from "@nestjs/swagger";
@@ -26,5 +26,20 @@ export class BuildingsController {
     @Get()
     public getBuildings(): Promise<BuildingEntity[]> {
         return this.buildingsService.getBuildings()
+    }
+
+    @Get(':id')
+    public getBuildingById(@Param('id') buildingId:number): Promise<BuildingEntity> {
+        return this.buildingsService.getBuildingById(buildingId)
+    }
+
+    @Patch(':id')
+    public updateBuilding(@Param('id') buildingId:number, @Body() buildingBody: CreateBuildingDto) {
+        return this.buildingsService.updateBuilding(buildingId, buildingBody)
+    }
+
+    @Delete(':id')
+    public deleteBuilding(@Param('id') buildingId:number) {
+        return this.buildingsService.deleteBuilding(buildingId)
     }
 }

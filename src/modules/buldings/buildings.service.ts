@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {BuildingEntity} from "./building.entity";
 import {Repository} from "typeorm";
@@ -8,7 +8,7 @@ import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
 @Injectable()
 export class BuildingsService {
     constructor(
-        @InjectRepository(BuildingEntity) private readonly buildingRepo: Repository<BuildingEntity>,
+        @InjectRepository(BuildingEntity) private buildingRepo: Repository<BuildingEntity>,
     ) {
     }
 
@@ -30,19 +30,78 @@ export class BuildingsService {
     }
 
     public getBuildingById(building_id: number): Promise<BuildingEntity> {
-        return this.buildingRepo.findOneBy({
+        const building = this.buildingRepo.findOneBy({
             id: building_id
         })
+
+        if (!building) {
+            throw new NotFoundException("Building with such name doesn't exist");
+        }
+
+        return building;
     }
 
     public async getBuildingByName(building_name: string): Promise<BuildingEntity> {
-        return this.buildingRepo.findOneBy({
+        const building = this.buildingRepo.findOneBy({
             name: building_name
         })
+
+        if (!building) {
+            throw new NotFoundException("Building with such name doesn't exist");
+        }
+        
+        return building;
     }
 
 
     public async getBuildings(): Promise<BuildingEntity[]> {
-        return await this.buildingRepo.find()
+        return await this.buildingRepo.find();
+    }
+
+    public async updateBuilding(buildingId:number, buildingBody: CreateBuildingDto) {
+        const building = await this.getBuildingById(buildingId);
+        if (!building) {
+            throw new NotFoundException('Building with such name is not registered');
+        }
+
+        const buildingName = buildingBody.name;
+        const buildingDesc = buildingBody.description;
+
+        if (!buildingBody.name) {
+            const buildingName = building.name;
+        }
+        if (!buildingBody.description) {
+            const buildingDesc = building.description;
+        }
+
+        try {
+            if (buildingName) {
+                await this.buildingRepo.update({ id: buildingId }, { name: buildingName });
+                //return await this.buildingRepo.save(building);
+            }
+
+            if (buildingDesc) {
+                await this.buildingRepo.update({ id: buildingId }, { description: buildingDesc });
+                //return await this.buildingRepo.save(building);
+            }
+
+        } catch (error) {
+            throw error;
+        }
+
+    }
+
+    public async deleteBuilding(buildingId:number) {
+        const building = await this.getBuildingById(buildingId);
+        if (!building) {
+            throw new NotFoundException('Building with such name is not registered');
+        }
+        
+        try {
+            await this.buildingRepo.delete({ id: buildingId });
+            return null;
+        } catch (error) {
+            throw error;
+        }
     }
 }
