@@ -23,6 +23,18 @@ export class BuildingsController {
         return this.buildingsService.createBuilding(buildingBody)
     }
 
+    @Roles(EUserRoles.ADMIN)
+    @Patch(':id')
+    public updateBuilding(@Param('id') buildingId:number, @Body() buildingBody: CreateBuildingDto) {
+        return this.buildingsService.updateBuilding(buildingId, buildingBody)
+    }
+
+    @Roles(EUserRoles.ADMIN)
+    @Delete(':id')
+    public deleteBuilding(@Param('id') buildingId:number) {
+        return this.buildingsService.deleteBuilding(buildingId)
+    }
+
     @Get()
     public getBuildings(): Promise<BuildingEntity[]> {
         return this.buildingsService.getBuildings()
@@ -31,15 +43,5 @@ export class BuildingsController {
     @Get(':id')
     public getBuildingById(@Param('id') buildingId:number): Promise<BuildingEntity> {
         return this.buildingsService.getBuildingById(buildingId)
-    }
-
-    @Patch(':id')
-    public updateBuilding(@Param('id') buildingId:number, @Body() buildingBody: CreateBuildingDto) {
-        return this.buildingsService.updateBuilding(buildingId, buildingBody)
-    }
-
-    @Delete(':id')
-    public deleteBuilding(@Param('id') buildingId:number) {
-        return this.buildingsService.deleteBuilding(buildingId)
     }
 }
