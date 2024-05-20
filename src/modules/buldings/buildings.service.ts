@@ -3,6 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {BuildingEntity} from "./building.entity";
 import {Repository} from "typeorm";
 import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
+import {UserEntity} from "../users/user.entity";
 
 
 @Injectable()
@@ -12,9 +13,12 @@ export class BuildingsService {
     ) {
     }
 
-    public async createBuilding(building_body: CreateBuildingDto): Promise<BuildingEntity> {
-        const building = this.buildingRepo.create(building_body)
-
+    public async createBuilding(building_body: CreateBuildingDto, user: UserEntity): Promise<BuildingEntity> {
+        console.log(user)
+        const building = this.buildingRepo.create({
+            ...building_body,
+            created_by: user
+        })
         const created_building = await this.getBuildingByName(building.name)
 
         if (created_building) {
