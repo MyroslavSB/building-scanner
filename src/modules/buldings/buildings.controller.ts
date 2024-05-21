@@ -1,7 +1,7 @@
 import {BuildingsService} from "./buildings.service";
 import {BuildingEntity} from "./building.entity";
 import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
-import {Body, Controller, Get, Post, Put, Patch, Delete, UseGuards, Param, Req} from "@nestjs/common";
+import {Body, Controller, Get, Post, Patch, Delete, UseGuards, Param, Req} from "@nestjs/common";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {RolesGuard} from "../../guards/roles/roles.guard";
 import {ApiTags} from "@nestjs/swagger";

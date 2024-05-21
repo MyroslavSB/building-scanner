@@ -4,9 +4,7 @@ import {BuildingEntity} from "./building.entity";
 import {Repository} from "typeorm";
 import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
 import {UserEntity} from "../users/user.entity";
-import {VisitsService} from "../visits/visits.service";
 import {VisitEntity} from "../visits/visit.entity";
-import {VisitsModule} from "../visits/visits.module";
 
 
 @Injectable()
