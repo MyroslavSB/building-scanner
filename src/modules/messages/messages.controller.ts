@@ -2,10 +2,12 @@ import {MessagesService} from "./messages.service";
 import {MessageEntity} from "./message.entity";
 import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
 import {CreateMessageDto} from "./utils/dto/create-message-dto";
-import {ApiTags} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 
 @ApiTags('messages')
+@ApiBearerAuth('access_token')
+@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 @UseGuards(JwtGuard)
 @Controller('messages')
 export class MessagesController {

@@ -17,12 +17,12 @@ export class UsersService {
 
         const emailExists = await this.userRepo.findOne({where: {email}});
         if (emailExists) {
-            throw new BadRequestException('Email is already in use');
+            throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST);
         }
 
         const usernameExists = await this.userRepo.findOne({where: {username}});
         if (usernameExists) {
-            throw new BadRequestException('Username is already in use');
+            throw new HttpException('Username is already in use', HttpStatus.BAD_REQUEST);
         }
 
         // Hash the password before saving to the database
@@ -38,7 +38,7 @@ export class UsersService {
             return await this.userRepo.save(newUser);
         } catch (error) {
             if (error.code === 'ER_DUP_ENTRY' || error.driverError?.code === 'ER_DUP_ENTRY') {
-                throw new HttpException('This email is already registered.', HttpStatus.BAD_REQUEST);
+                throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST);
             }
 
             throw error;
@@ -50,10 +50,14 @@ export class UsersService {
             email
         })
 
+        if (!user) {
+            throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+        }
+
         const samePassword: boolean = await bcrypt.compare(password, user.password)
 
-        if (!user || !samePassword) {
-            throw new UnauthorizedException('Invalid credentials');
+        if (!samePassword) {
+            throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
         }
 
         return user

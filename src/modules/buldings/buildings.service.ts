@@ -73,7 +73,7 @@ export class BuildingsService {
     public async updateBuilding(buildingId: number, buildingBody: CreateBuildingDto) {
         const building = await this.getBuildingById(buildingId);
         if (!building) {
-            throw new NotFoundException('Building with such name is not registered');
+            throw new NotFoundException('Building with such id is not registered');
         }
 
         const buildingName = buildingBody.name;
@@ -106,7 +106,7 @@ export class BuildingsService {
     public async deleteBuilding(buildingId: number) {
         const building = await this.getBuildingById(buildingId);
         if (!building) {
-            throw new NotFoundException('Building with such name is not registered');
+            throw new NotFoundException('Building with such id is not registered');
         }
 
         try {
