@@ -21,6 +21,7 @@ export class MessagesService {
             message.user = {id: user_id} as UserEntity; // Set user by ID
             message.created_at = new Date(); // Set created date
 
+
             return this.messageRepo.save(message);
         } catch (error) {
             if (error.code === 'ER_NO_REFERENCED_ROW' || error.code === 'ER_NO_REFERENCED_ROW_2') {

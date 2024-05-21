@@ -40,7 +40,7 @@ export class BuildingsService {
         })
 
         if (!building) {
-            throw new NotFoundException("Building with such name doesn't exist");
+            throw new NotFoundException("Building with such id is not registered");
         }
 
         return building;
