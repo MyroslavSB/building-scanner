@@ -5,7 +5,6 @@ import {UserEntity} from "../users/user.entity";
 import {RegisterUserDto} from "../users/utils/dtos/register-user-dto";
 import {UserLoginDto} from "../users/utils/dtos/user-login-dto";
 import {ApiBadRequestResponse, ApiTags} from "@nestjs/swagger";
-import {BadCreateBuildingResponse} from "../buldings/utils/reponses/bad-create-building.response";
 import {BadLoginResponse} from "./utils/responses/bad-login-response";
 import {BadRegisterResponse, BadRegisterUsernameResponse} from "./utils/responses/bad-register-response";
 

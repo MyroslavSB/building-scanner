@@ -8,7 +8,6 @@ import {ApiBadRequestResponse, ApiBearerAuth, ApiTags, ApiUnauthorizedResponse} 
 import {Roles} from "../../shared/decorators/roles.decorator";
 import {EUserRoles} from "../users/utils/enums/e-user-roles";
 import {VisitsService} from "../visits/visits.service";
-import {BadVisitResponse} from "../visits/utils/responses/bad-visit-response";
 import {BadCreateBuildingResponse} from "./utils/reponses/bad-create-building.response";
 import {BadUpdateBuildingResponse} from "./utils/reponses/bad-update-building-response";
 
