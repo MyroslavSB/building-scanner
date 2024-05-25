@@ -21,6 +21,14 @@ async function bootstrap() {
     const config = new DocumentBuilder()
         .setTitle('Building scanner')
         .setDescription('The building scanner API description')
+        .addBearerAuth(
+            {
+                type: 'apiKey',
+                name: 'Authorization',
+                in: 'header',
+            },
+            'access_token',
+        )
         .setVersion('1.0')
         .build();
     const document = SwaggerModule.createDocument(app, config);

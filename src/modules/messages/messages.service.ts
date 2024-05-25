@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable, NotFoundException} from "@nestjs/common";
+import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {MessageEntity} from "./message.entity";
 import {Repository} from "typeorm";
@@ -20,6 +20,7 @@ export class MessagesService {
             message.building = {id: message_body.building_id} as BuildingEntity; // Set building by ID
             message.user = {id: user_id} as UserEntity; // Set user by ID
             message.created_at = new Date(); // Set created date
+
 
             return this.messageRepo.save(message);
         } catch (error) {
