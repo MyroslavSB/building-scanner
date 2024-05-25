@@ -1,9 +1,8 @@
-import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {BadRequestException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {VisitEntity} from "./visit.entity";
 import {Repository} from "typeorm";
 import {VisitBuildingDto} from "./utils/interfaces/visit-building-dto";
-import {AchievementEntity} from "../achievements/achievement.entity";
 import {BuildingEntity} from "../buldings/building.entity";
 import {AchievementsService} from "../achievements/achievements.service";
 import {BuildingsService} from "../buldings/buildings.service";
@@ -34,7 +33,7 @@ export class VisitsService {
         const visit: VisitEntity = this.visitRepo.create({
             building: {id: visit_body.building_id},
             user: {id: userId},
-            visit_date: new Date().toISOString(), // or use another method to set the date appropriately
+            visit_date: new Date().toISOString()
         });
 
         if (!previousVisit) {

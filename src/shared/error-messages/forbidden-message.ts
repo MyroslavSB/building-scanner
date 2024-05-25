@@ -1,12 +1,9 @@
 import {ApiProperty} from "@nestjs/swagger";
 
-export class ForbiddenResponse {
+export class ForbiddenMessage {
     @ApiProperty({example: 403})
     statusCode: number;
 
     @ApiProperty({example: 'Access denied: insufficient permissions'})
     message: string;
-
-    @ApiProperty({example: 'Forbidden'})
-    error: string
 }

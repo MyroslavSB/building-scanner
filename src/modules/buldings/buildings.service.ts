@@ -1,4 +1,4 @@
-import {BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException} from "@nestjs/common";
+import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {BuildingEntity} from "./building.entity";
 import {Repository} from "typeorm";
@@ -73,18 +73,20 @@ export class BuildingsService {
 
     public async updateBuilding(buildingId: number, buildingBody: CreateBuildingDto) {
         const building = await this.getBuildingById(buildingId);
+
         if (!building) {
-            throw new NotFoundException('Building with such id is not registered');
+            throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
-        const buildingName = buildingBody.name;
-        const buildingDesc = buildingBody.description;
+        let buildingName: string = buildingBody.name;
+        let buildingDesc: string = buildingBody.description;
 
         if (!buildingBody.name) {
-            const buildingName = building.name;
+            buildingName = building.name;
         }
+
         if (!buildingBody.description) {
-            const buildingDesc = building.description;
+            buildingDesc = building.description;
         }
 
         try {
@@ -107,7 +109,7 @@ export class BuildingsService {
     public async deleteBuilding(buildingId: number) {
         const building = await this.getBuildingById(buildingId);
         if (!building) {
-            throw new NotFoundException('Building with such id is not registered');
+            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
         try {

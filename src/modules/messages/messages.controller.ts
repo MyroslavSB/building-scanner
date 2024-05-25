@@ -14,13 +14,13 @@ import {
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {BuildingsService} from "../buldings/buildings.service";
 import {NoSuchBuildingResponse} from "./utils/responses/no-such-building-response";
-import {ForbiddenResponse} from "../../shared/responses/forbidden-response";
-import {UnauthorizedResponse} from "../../shared/responses/unauthorized-response";
+import {ForbiddenMessage} from "../../shared/error-messages/forbidden-message";
+import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
 
 @ApiTags('messages')
 @ApiBearerAuth('access_token')
-@ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedResponse })
-@ApiForbiddenResponse({description: 'Forbidden', type: ForbiddenResponse})
+@ApiUnauthorizedResponse({description: 'Unauthorized', type: UnauthorizedMessage})
+@ApiForbiddenResponse({description: 'Forbidden', type: ForbiddenMessage})
 @UseGuards(JwtGuard)
 @Controller('messages')
 export class MessagesController {
@@ -50,8 +50,8 @@ export class MessagesController {
         return this.messagesService.getMessages()
     }
 
-    @Get(':building_id')
-    public getMessagesByBuilding(@Param('building_id') buildingId:number): Promise<MessageEntity[]> {
+    @Get(':id')
+    public getMessagesByBuilding(@Param('id') buildingId: number): Promise<MessageEntity[]> {
         return this.messagesService.getMessagesByBuilding(buildingId)
     }
 }

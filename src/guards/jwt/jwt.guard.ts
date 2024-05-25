@@ -19,7 +19,7 @@ export class JwtGuard implements CanActivate {
         const token: string = extractTokenFromHeader(request);
 
         if (!token) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(EUnauthorizedResponses.UNAUTHORIZED);
         }
 
         try {

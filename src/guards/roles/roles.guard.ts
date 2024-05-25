@@ -33,7 +33,7 @@ export class RolesGuard implements CanActivate {
         const token: string = extractTokenFromHeader(request);
 
         if (!token) {
-            throw new UnauthorizedException(EUnauthorizedResponses.NO_TOKEN);
+            throw new UnauthorizedException(EUnauthorizedResponses.UNAUTHORIZED);
         }
 
         const user = request.user
