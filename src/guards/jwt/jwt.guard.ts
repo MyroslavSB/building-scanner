@@ -3,6 +3,7 @@ import {JwtService} from "@nestjs/jwt";
 import {jwtConstants} from "../../shared/utils/constants/jwt-constants";
 import {extractTokenFromHeader} from "../../shared/utils/functions/extract-token-from-header";
 import {UsersService} from "../../modules/users/users.service";
+import {EUnauthorizedResponses} from "../../shared/enums/e-unauthorized-responses";
 
 @Injectable()
 export class JwtGuard implements CanActivate {
@@ -34,7 +35,7 @@ export class JwtGuard implements CanActivate {
 
         } catch (err) {
             // Handle invalid or expired tokens
-            throw new UnauthorizedException('Invalid or expired token: JwtGuard');
+            throw new UnauthorizedException(EUnauthorizedResponses.UNAUTHORIZED);
         }
 
         return true;

@@ -4,14 +4,23 @@ import {MessageEntity} from "./message.entity";
 import {Body, Controller, Get, HttpException, HttpStatus, Post, Param, UseGuards} from "@nestjs/common";
 
 import {CreateMessageDto} from "./utils/dto/create-message-dto";
-import {ApiBadRequestResponse, ApiBearerAuth, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth,
+    ApiForbiddenResponse,
+    ApiTags,
+    ApiUnauthorizedResponse
+} from "@nestjs/swagger";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {BuildingsService} from "../buldings/buildings.service";
 import {NoSuchBuildingResponse} from "./utils/responses/no-such-building-response";
+import {ForbiddenResponse} from "../../shared/responses/forbidden-response";
+import {UnauthorizedResponse} from "../../shared/responses/unauthorized-response";
 
 @ApiTags('messages')
 @ApiBearerAuth('access_token')
-@ApiUnauthorizedResponse({description: 'Unauthorized'})
+@ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedResponse })
+@ApiForbiddenResponse({description: 'Forbidden', type: ForbiddenResponse})
 @UseGuards(JwtGuard)
 @Controller('messages')
 export class MessagesController {

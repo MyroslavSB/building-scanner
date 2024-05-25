@@ -1,10 +1,11 @@
-import {HttpException, HttpStatus, Injectable, NotFoundException} from "@nestjs/common";
+import {BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {BuildingEntity} from "./building.entity";
 import {Repository} from "typeorm";
 import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
 import {UserEntity} from "../users/user.entity";
 import {VisitEntity} from "../visits/visit.entity";
+import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 
 
 @Injectable()
@@ -23,7 +24,7 @@ export class BuildingsService {
         const created_building = await this.getBuildingByName(building.name)
 
         if (created_building) {
-            throw new HttpException('Building with such name has already been registered', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException(EBadRequestMessages.EXISTING_BUILDING_NAME);
         }
 
         try {
@@ -40,7 +41,7 @@ export class BuildingsService {
         })
 
         if (!building) {
-            throw new NotFoundException("Building with such id is not registered");
+            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
         return building;
@@ -52,7 +53,7 @@ export class BuildingsService {
         })
 
         if (!building) {
-            throw new NotFoundException("Building with such name doesn't exist");
+            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_NAME);
         }
 
         return building;

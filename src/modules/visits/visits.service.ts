@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {VisitEntity} from "./visit.entity";
 import {Repository} from "typeorm";
@@ -7,6 +7,7 @@ import {AchievementEntity} from "../achievements/achievement.entity";
 import {BuildingEntity} from "../buldings/building.entity";
 import {AchievementsService} from "../achievements/achievements.service";
 import {BuildingsService} from "../buldings/buildings.service";
+import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 
 @Injectable()
 export class VisitsService {
@@ -22,7 +23,7 @@ export class VisitsService {
         const building: BuildingEntity = await this.buildingsService.getBuildingById(visit_body.building_id)
 
         if (!building) {
-            throw new HttpException('Such building doesn\'t exist', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
         const previousVisit: VisitEntity = await this.visitRepo.findOneBy({
@@ -30,7 +31,7 @@ export class VisitsService {
             user: {id: userId}
         });
 
-        const visit = this.visitRepo.create({
+        const visit: VisitEntity = this.visitRepo.create({
             building: {id: visit_body.building_id},
             user: {id: userId},
             visit_date: new Date().toISOString(), // or use another method to set the date appropriately

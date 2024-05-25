@@ -4,7 +4,7 @@ import {UsersService} from "../users/users.service";
 import {UserEntity} from "../users/user.entity";
 import {RegisterUserDto} from "../users/utils/dtos/register-user-dto";
 import {UserLoginDto} from "../users/utils/dtos/user-login-dto";
-import {ApiBadRequestResponse, ApiTags} from "@nestjs/swagger";
+import {ApiBadRequestResponse, ApiPreconditionFailedResponse, ApiTags} from "@nestjs/swagger";
 import {BadLoginResponse} from "./utils/responses/bad-login-response";
 import {BadRegisterResponse, BadRegisterUsernameResponse} from "./utils/responses/bad-register-response";
 
@@ -33,10 +33,6 @@ export class AuthController {
     @ApiBadRequestResponse({
         description: 'Bad Request',
         type: BadRegisterResponse,
-    })
-    @ApiBadRequestResponse({
-        description: 'Bad Request',
-        type: BadRegisterUsernameResponse,
     })
     @Post('register')
     async register(@Body() registerUserDto: RegisterUserDto) {

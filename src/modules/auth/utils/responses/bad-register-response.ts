@@ -4,7 +4,7 @@ export class BadRegisterResponse {
     @ApiProperty({example: 400})
     statusCode: number;
 
-    @ApiProperty({example: 'Email is already in use'})
+    @ApiProperty({example: 'Email or username is already in use'})
     message: string;
 }
 

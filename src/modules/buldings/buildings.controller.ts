@@ -4,16 +4,25 @@ import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
 import {Body, Controller, Get, Post, Patch, Delete, UseGuards, Param, Req} from "@nestjs/common";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {RolesGuard} from "../../guards/roles/roles.guard";
-import {ApiBadRequestResponse, ApiBearerAuth, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth,
+    ApiForbiddenResponse,
+    ApiTags,
+    ApiUnauthorizedResponse
+} from "@nestjs/swagger";
 import {Roles} from "../../shared/decorators/roles.decorator";
 import {EUserRoles} from "../users/utils/enums/e-user-roles";
 import {VisitsService} from "../visits/visits.service";
 import {BadCreateBuildingResponse} from "./utils/reponses/bad-create-building.response";
 import {BadUpdateBuildingResponse} from "./utils/reponses/bad-update-building-response";
+import {ForbiddenResponse} from "../../shared/responses/forbidden-response";
+import {UnauthorizedResponse} from "../../shared/responses/unauthorized-response";
 
 @ApiTags('buildings')
 @ApiBearerAuth('access_token')
-@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+@ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedResponse })
+@ApiForbiddenResponse({description: 'Forbidden', type: ForbiddenResponse})
 @UseGuards(JwtGuard, RolesGuard)
 @Controller('buildings')
 export class BuildingsController {
