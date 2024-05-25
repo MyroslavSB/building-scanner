@@ -37,4 +37,15 @@ export class MessagesService {
     public async getMessages(): Promise<MessageEntity[]> {
         return await this.messageRepo.find()
     }
+
+    public async getMessagesByBuilding(buildingId:number): Promise<MessageEntity[]> {
+        return await this.messageRepo.find({
+            where: {
+                building: {
+                    id: buildingId,
+                },
+            },
+            relations: ['building'],
+        });
+    }
 }
