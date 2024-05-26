@@ -16,6 +16,7 @@ import {ForbiddenMessage} from "../../shared/error-messages/forbidden-message";
 import {RolesGuard} from "../../guards/roles/roles.guard";
 import {Roles} from "../../shared/decorators/roles.decorator";
 import {EUserRoles} from "../users/utils/enums/e-user-roles";
+import {VisitDto} from "../../shared/response-models/visit-dto";
 
 @ApiTags('visits')
 @ApiBearerAuth('access_token')
@@ -39,11 +40,11 @@ export class VisitsController {
     @Roles(EUserRoles.USER)
     @Post()
     public makeVisit(@Body() visitBuildingDto: VisitBuildingDto, @Req() req): Promise<VisitEntity> {
-        return this.visitsService.createVisit(visitBuildingDto, req.user.id)
+        return this.visitsService.createVisit(visitBuildingDto, req.user)
     }
 
     @Get()
-    public getVisits(): Promise<VisitEntity[]> {
-        return this.visitsService.getVisits()
+    public getVisits(@Req() req): Promise<VisitDto[]> {
+        return this.visitsService.getUserVisits(req.user.id)
     }
 }

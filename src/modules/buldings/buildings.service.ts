@@ -6,6 +6,11 @@ import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
 import {UserEntity} from "../users/user.entity";
 import {VisitEntity} from "../visits/visit.entity";
 import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
+import {BuildingDto} from "../../shared/response-models/building-dto";
+import {processUserEntity} from "../../shared/functions/process-user-entity";
+import {processBuildingEntity} from "../../shared/functions/process-building-entity";
+import {EUserRoles} from "../users/utils/enums/e-user-roles";
+import {UserDto} from "../../shared/response-models/user-dto";
 
 
 @Injectable()
@@ -15,28 +20,46 @@ export class BuildingsService {
     ) {
     }
 
-    public async createBuilding(building_body: CreateBuildingDto, user: UserEntity): Promise<BuildingEntity> {
+    public async createBuilding(building_body: CreateBuildingDto, user: UserEntity): Promise<BuildingDto> {
 
-        const building = this.buildingRepo.create({
+        const building: BuildingEntity = this.buildingRepo.create({
             ...building_body,
             created_by: user
         })
-        const created_building = await this.getBuildingByName(building.name)
 
-        if (created_building) {
+        const building_present: BuildingEntity = await this.getBuildingByName(building.name)
+
+        if (!!building_present) {
             throw new BadRequestException(EBadRequestMessages.EXISTING_BUILDING_NAME);
         }
 
+        const {id, name, description, location, created_at, updated_at, qr_code} = await this.buildingRepo.save(building)
+
+        const created_buildings: BuildingEntity[] = await this.findUserBuildings(user.id)
+
+        const buildingDto: BuildingDto = {
+            id,
+            name,
+            description,
+            location,
+            created_at,
+            updated_at,
+            qr_code,
+            visited: false,
+            visits_count: 0,
+            created_by: processUserEntity(user)
+        }
+
         try {
-            return await this.buildingRepo.save(building)
+            return buildingDto
 
         } catch (error) {
             throw error;
         }
     }
 
-    public getBuildingById(building_id: number): Promise<BuildingEntity> {
-        const building = this.buildingRepo.findOneBy({
+    public async getBuildingById(building_id: number): Promise<BuildingEntity> {
+        const building: BuildingEntity = await this.buildingRepo.findOneBy({
             id: building_id
         })
 
@@ -48,31 +71,37 @@ export class BuildingsService {
     }
 
     public async getBuildingByName(building_name: string): Promise<BuildingEntity> {
-        const building = this.buildingRepo.findOneBy({
+        return await this.buildingRepo.findOneBy({
             name: building_name
         })
-
-        if (!building) {
-            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_NAME);
-        }
-
-        return building;
     }
 
 
-    public async getBuildings(visits_promise: Promise<VisitEntity[]>): Promise<BuildingEntity[]> {
-        const buildings = await this.buildingRepo.find();
-        const visits = await visits_promise
-        const visitedBuildingIds = visits.map(visit => visit.id)
+    public async getBuildings(): Promise<BuildingEntity[]> {
+        // const buildings: BuildingEntity[] = this.buildingRepo.find();
 
-        return buildings.map(building => ({
-            ...building,
-            visited: visitedBuildingIds.includes(building.id),
-        }));
+        return this.buildingRepo.find()
+
+        // return Promise.all(buildings.map(async (building) => {
+        //     console.log(visits)
+        //     const user_visits: VisitEntity[] = visits.filter(visit => visit.user.id === user.id);
+        //     console.log('user_visits: ', user_visits);
+        //
+        //     const user_buildings: BuildingEntity[] = await this.findUserBuildings(user.id);
+        //     console.log('user_buildings: ', user_buildings);
+        //
+        //     const processed_user: UserDto = processUserEntity(user, user_visits.length, user_buildings.length);
+        //     console.log('processed_user: ', processed_user);
+        //
+        //     const building_visits: VisitEntity[] = visits.filter(visit => visit.building.id === building.id);
+        //     console.log('building_visits: ', building_visits);
+        //
+        //     return processBuildingEntity(building, processed_user, building_visits.length, user_visits.some(visit => visit.building.id === building.id));
+        // }));
     }
 
     public async updateBuilding(buildingId: number, buildingBody: CreateBuildingDto) {
-        const building = await this.getBuildingById(buildingId);
+        const building: BuildingEntity = await this.getBuildingById(buildingId);
 
         if (!building) {
             throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID);
@@ -107,7 +136,7 @@ export class BuildingsService {
     }
 
     public async deleteBuilding(buildingId: number) {
-        const building = await this.getBuildingById(buildingId);
+        const building: BuildingEntity = await this.getBuildingById(buildingId);
         if (!building) {
             throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
         }
@@ -118,5 +147,13 @@ export class BuildingsService {
         } catch (error) {
             throw error;
         }
+    }
+
+    private findUserBuildings(user_id: number): Promise<BuildingEntity[]> {
+        return this.buildingRepo.find({
+            where: {
+                created_by: {id: user_id}
+            }
+        })
     }
 }

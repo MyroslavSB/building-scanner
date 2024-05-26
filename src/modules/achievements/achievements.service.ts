@@ -3,6 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {AchievementEntity} from "./achievement.entity";
 import {Repository} from "typeorm";
 import {VisitEntity} from "../visits/visit.entity";
+import {UserEntity} from "../users/user.entity";
 
 @Injectable()
 export class AchievementsService {
@@ -12,13 +13,13 @@ export class AchievementsService {
     ) {
     }
 
-    public async createAchievement(userId: number, building_name: string, visit: VisitEntity): Promise<AchievementEntity> {
+    public async createAchievement(user: UserEntity, building_name: string, visit: VisitEntity): Promise<AchievementEntity> {
         const achievement = this.achievementRepo.create({
             title: "First Visit!",
             description: `You visited ${building_name} for the first time!`,
-            user: { id: userId },
+            user,
             obtained_date: visit.visit_date,
-            visit: {id: visit.id}
+            visit
         });
 
         return await this.achievementRepo.save(achievement);

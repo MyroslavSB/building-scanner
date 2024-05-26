@@ -18,6 +18,8 @@ import {BadCreateBuildingResponse} from "./utils/reponses/bad-create-building.re
 import {BadUpdateBuildingResponse} from "./utils/reponses/bad-update-building-response";
 import {ForbiddenMessage} from "../../shared/error-messages/forbidden-message";
 import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
+import {BuildingDto} from "../../shared/response-models/building-dto";
+import {VisitEntity} from "../visits/visit.entity";
 
 @ApiTags('buildings')
 @ApiBearerAuth('access_token')
@@ -41,7 +43,7 @@ export class BuildingsController {
     })
     @Roles(EUserRoles.ADMIN)
     @Post()
-    public createBuilding(@Body() buildingBody: CreateBuildingDto, @Req() req): Promise<BuildingEntity> {
+    public async createBuilding(@Body() buildingBody: CreateBuildingDto, @Req() req): Promise<BuildingDto> {
         return this.buildingsService.createBuilding(buildingBody, req.user)
     }
 
@@ -74,13 +76,15 @@ export class BuildingsController {
     }
 
     @Get()
-    public getBuildings(): Promise<BuildingEntity[]> {
-        const visits = this.visitsService.getVisits()
-        return this.buildingsService.getBuildings(visits)
+    public async getBuildings(@Req() user): Promise<BuildingEntity[]> {
+        // const visits: VisitEntity[] = await this.visitsService.getUserVisits(user.id) || []
+
+        return this.buildingsService.getBuildings()
     }
 
     @Get(':id')
     public getBuildingById(@Param('id') buildingId: number): Promise<BuildingEntity> {
         return this.buildingsService.getBuildingById(buildingId)
     }
+
 }
