@@ -28,8 +28,7 @@ import {VisitEntity} from "../visits/visit.entity";
 @Controller('buildings')
 export class BuildingsController {
     constructor(
-        private buildingsService: BuildingsService,
-        private visitsService: VisitsService
+        private buildingsService: BuildingsService
     ) {
     }
 
@@ -57,8 +56,8 @@ export class BuildingsController {
     })
     @Roles(EUserRoles.ADMIN)
     @Patch(':id')
-    public updateBuilding(@Param('id') buildingId: number, @Body() buildingBody: CreateBuildingDto) {
-        return this.buildingsService.updateBuilding(buildingId, buildingBody)
+    public updateBuilding(@Param('id') buildingId: number, @Body() buildingBody: CreateBuildingDto, @Req() req) {
+        return this.buildingsService.updateBuilding(buildingId, buildingBody, req.user)
     }
 
     @ApiBadRequestResponse({

@@ -73,14 +73,12 @@ export class UsersService {
         return this.userRepo.findOneBy({ username });
     }
 
-    public async findDtoById(id: number): Promise<UserDto> {
-        const rawUser = await this.userRepo.findOne({
+    public async findUserById(id: number): Promise<UserEntity> {
+        return await this.userRepo.findOne({
             where: {
                 id
             },
             relations: ['buildings', 'visits']
         })
-
-        return processUserEntity(rawUser)
     }
 }

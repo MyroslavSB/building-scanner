@@ -1,11 +1,12 @@
 import {BuildingEntity} from "../../modules/buldings/building.entity";
 import {BuildingDto} from "../response-models/building-dto";
 import {UserDto} from "../response-models/user-dto";
+import {processUserEntity} from "./process-user-entity";
 
 export function processBuildingEntity(building: BuildingEntity, userId: number): BuildingDto {
-    const created_by = this.toUserDto(building.created_by);
-    const visits_count = building.visits.length;
-    const visited = building.visits.some(visit => visit.user.id === userId);
+    const created_by: UserDto = processUserEntity(building.created_by);
+    const visits_count: number = building.visits.length;
+    const visited: boolean = building.visits.some(visit => visit.user.id === userId);
 
     return {
         id: building.id,

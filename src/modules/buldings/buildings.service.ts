@@ -3,12 +3,12 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {BuildingEntity} from "./building.entity";
 import {Repository} from "typeorm";
 import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
-import {UserEntity} from "../users/user.entity";
-import {VisitEntity} from "../visits/visit.entity";
 import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 import {BuildingDto} from "../../shared/response-models/building-dto";
-import {processUserEntity} from "../../shared/functions/process-user-entity";
 import {UserDto} from "../../shared/response-models/user-dto";
+import {UserEntity} from "../users/user.entity";
+import {processUserEntity} from "../../shared/functions/process-user-entity";
+import {processBuildingEntity} from "../../shared/functions/process-building-entity";
 
 @Injectable()
 export class BuildingsService {
@@ -17,7 +17,7 @@ export class BuildingsService {
     ) {
     }
 
-    public async createBuilding(building_body: CreateBuildingDto, user: UserDto): Promise<BuildingDto> {
+    public async createBuilding(building_body: CreateBuildingDto, user: UserEntity): Promise<BuildingDto> {
         const building: BuildingEntity = this.buildingRepo.create({
             ...building_body,
             created_by: user
@@ -29,9 +29,19 @@ export class BuildingsService {
             throw new BadRequestException(EBadRequestMessages.EXISTING_BUILDING_NAME);
         }
 
-        const {id, name, description, location, created_at, updated_at, qr_code} = await this.buildingRepo.save(building)
+        const {
+            id,
+            name,
+            description,
+            location,
+            created_at,
+            updated_at,
+            qr_code
+        } = await this.buildingRepo.save(building)
 
-        user.created_buildings_count = user.created_buildings_count + 1
+        const created_by: UserDto = processUserEntity(user)
+        created_by.created_buildings_count = created_by.created_buildings_count + 1
+
         const buildingDto: BuildingDto = {
             id,
             name,
@@ -42,7 +52,7 @@ export class BuildingsService {
             qr_code,
             visited: false,
             visits_count: 0,
-            created_by: user
+            created_by
         }
 
         try {
@@ -51,18 +61,6 @@ export class BuildingsService {
         } catch (error) {
             throw error;
         }
-    }
-
-    public async getBuildingById(building_id: number): Promise<BuildingEntity> {
-        const building: BuildingEntity = await this.buildingRepo.findOneBy({
-            id: building_id
-        })
-
-        if (!building) {
-            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
-        }
-
-        return building;
     }
 
     public async getBuildingByName(building_name: string): Promise<BuildingEntity> {
@@ -95,7 +93,7 @@ export class BuildingsService {
         // }));
     }
 
-    public async updateBuilding(buildingId: number, buildingBody: CreateBuildingDto) {
+    public async updateBuilding(buildingId: number, buildingBody: CreateBuildingDto, user: UserEntity): Promise<BuildingDto> {
         const building: BuildingEntity = await this.getBuildingById(buildingId);
 
         if (!building) {
@@ -124,6 +122,7 @@ export class BuildingsService {
                 //return await this.buildingRepo.save(building);
             }
 
+            return processBuildingEntity(await this.getBuildingById(buildingId), user.id)
         } catch (error) {
             throw error;
         }
@@ -150,5 +149,20 @@ export class BuildingsService {
                 created_by: {id: user_id}
             }
         })
+    }
+
+    public async getBuildingById(building_id: number): Promise<BuildingEntity> {
+        const building: BuildingEntity = await this.buildingRepo.findOne({
+            where: {
+                id: building_id
+            },
+            relations: ['visits', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
+
+        if (!building) {
+            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
+        }
+
+        return building;
     }
 }
