@@ -35,7 +35,7 @@ export class BuildingsController {
 
     @ApiBadRequestResponse({
         description: 'Bad Request',
-        type: BadCreateBuildingResponse,
+        type: BadCreateBuildingResponse
     })
     @ApiForbiddenResponse({
         description: 'Forbidden',

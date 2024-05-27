@@ -8,10 +8,7 @@ import {VisitEntity} from "../visits/visit.entity";
 import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 import {BuildingDto} from "../../shared/response-models/building-dto";
 import {processUserEntity} from "../../shared/functions/process-user-entity";
-import {processBuildingEntity} from "../../shared/functions/process-building-entity";
-import {EUserRoles} from "../users/utils/enums/e-user-roles";
 import {UserDto} from "../../shared/response-models/user-dto";
-
 
 @Injectable()
 export class BuildingsService {
@@ -20,8 +17,7 @@ export class BuildingsService {
     ) {
     }
 
-    public async createBuilding(building_body: CreateBuildingDto, user: UserEntity): Promise<BuildingDto> {
-
+    public async createBuilding(building_body: CreateBuildingDto, user: UserDto): Promise<BuildingDto> {
         const building: BuildingEntity = this.buildingRepo.create({
             ...building_body,
             created_by: user
@@ -35,8 +31,7 @@ export class BuildingsService {
 
         const {id, name, description, location, created_at, updated_at, qr_code} = await this.buildingRepo.save(building)
 
-        const created_buildings: BuildingEntity[] = await this.findUserBuildings(user.id)
-
+        user.created_buildings_count = user.created_buildings_count + 1
         const buildingDto: BuildingDto = {
             id,
             name,
@@ -47,7 +42,7 @@ export class BuildingsService {
             qr_code,
             visited: false,
             visits_count: 0,
-            created_by: processUserEntity(user)
+            created_by: user
         }
 
         try {
