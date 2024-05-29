@@ -2,10 +2,11 @@ import {VisitEntity} from "../../modules/visits/visit.entity";
 import {BuildingDto} from "../response-models/building-dto";
 import {VisitDto} from "../response-models/visit-dto";
 import {processUserEntity} from "./process-user-entity";
+import {BuildingEntity} from "../../modules/buldings/building.entity";
+import {UserEntity} from "../../modules/users/user.entity";
 
-export function processVisitEntity(visit: VisitEntity, userId: number): VisitDto {
-    const building = visit.building;
-
+export function processVisitEntity(visit: VisitEntity, user: UserEntity): VisitDto {
+    const building: BuildingEntity = visit.building;
 
     const buildingDto: BuildingDto = {
         id: building.id,
@@ -17,14 +18,14 @@ export function processVisitEntity(visit: VisitEntity, userId: number): VisitDto
         updated_at: building.updated_at,
         created_by: processUserEntity(visit.user),
         visits_count: building.visits.length,
-        visited: building.visits.some(visit => visit.user.id === userId)
+        visited: building.visits.some(visit => visit.user.id === user.id)
     };
-
-    delete visit.user.visits
-    delete visit.user.buildings
 
     return {
-        ...visit,
+        id: visit.id,
+        visit_date: visit.visit_date,
+        user: processUserEntity(user),
+        achievement: visit.achievement,
         building: buildingDto
-    };
+    }
 }

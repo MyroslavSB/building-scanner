@@ -38,12 +38,12 @@ export class VisitsController {
         type: ForbiddenMessage
     })
     @Roles(EUserRoles.USER)
-    @Post()
-    public makeVisit(@Body() visitBuildingDto: VisitBuildingDto, @Req() req): Promise<VisitEntity> {
+    @Post() //Tested, all good
+    public makeVisit(@Body() visitBuildingDto: VisitBuildingDto, @Req() req): Promise<VisitDto> {
         return this.visitsService.createVisit(visitBuildingDto, req.user)
     }
 
-    @Get()
+    @Get() //Tested, all good
     public getVisits(@Req() req): Promise<VisitDto[]> {
         return this.visitsService.getUserVisits(req.user.id)
     }

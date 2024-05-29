@@ -22,8 +22,8 @@ export class VisitsService {
     ) {
     }
 
-    public async createVisit(visit_body: VisitBuildingDto, user: UserEntity): Promise<VisitEntity> {
-        const building: BuildingDto = await this.buildingsService.getBuildingById(visit_body.building_id, user)
+    public async createVisit(visit_body: VisitBuildingDto, user: UserEntity): Promise<VisitDto> {
+        const building: BuildingEntity = await this.buildingsService.getBuildingWithRelations(visit_body.building_id)
 
         if (!building) {
             throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID);
@@ -40,32 +40,28 @@ export class VisitsService {
             visit_date: new Date().toISOString()
         });
 
-        if (!previousVisit) {
-            const saved = await this.visitRepo.save(visit);
+        const saved: VisitEntity = await this.visitRepo.save(visit);
 
+        if (!previousVisit) {
             await this.achievementsService.createAchievement(
                 user,
-                'building.name',
+                building.name,
                 visit
             )
-
-            return saved
         }
 
-        return this.visitRepo.save(visit)
 
+        return processVisitEntity(saved, user)
 
     }
 
-    public async getUserVisits(userId: number): Promise<VisitDto[]> {
+    public async getUserVisits(user: UserEntity): Promise<VisitDto[]> {
         const visits = await this.visitRepo.find({
-            where: { user: { id: userId } },
+            where: { user: { id: user.id } },
             relations: ['building', 'building.created_by', 'building.visits', 'building.visits.user', 'achievement', 'user', 'user.visits', 'user.buildings']
         });
 
-        // console.log(visits)
-
-        return visits.map(visit => processVisitEntity(visit, userId));
+        return visits.map(visit => processVisitEntity(visit, visit.user));
     }
 
     public async deleteBuildingVisits(building: BuildingEntity): Promise<void> {
