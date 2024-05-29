@@ -9,7 +9,6 @@ import {UserDto} from "../../shared/response-models/user-dto";
 import {UserEntity} from "../users/user.entity";
 import {processUserEntity} from "../../shared/functions/process-user-entity";
 import {processBuildingEntity} from "../../shared/functions/process-building-entity";
-import {VisitEntity} from "../visits/visit.entity";
 
 @Injectable()
 export class BuildingsService {

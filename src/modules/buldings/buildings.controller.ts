@@ -20,9 +20,7 @@ import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-mess
 import {BuildingDto} from "../../shared/response-models/building-dto";
 import {BadUpdateBuildingNameResponse} from "./utils/reponses/bad-update-building-name-response";
 import {VisitsService} from "../visits/visits.service";
-import {AchievementsService} from "../achievements/achievements.service";
 import {MessagesService} from "../messages/messages.service";
-import {DeleteResult} from "typeorm";
 import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 
 
