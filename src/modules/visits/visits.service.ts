@@ -3,13 +3,14 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {VisitEntity} from "./visit.entity";
 import {Repository} from "typeorm";
 import {VisitBuildingDto} from "./utils/interfaces/visit-building-dto";
-import {BuildingEntity} from "../buldings/building.entity";
 import {AchievementsService} from "../achievements/achievements.service";
 import {BuildingsService} from "../buldings/buildings.service";
 import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 import {UserEntity} from "../users/user.entity";
 import {processVisitEntity} from "../../shared/functions/process-visit-entity";
 import {VisitDto} from "../../shared/response-models/visit-dto";
+import {BuildingDto} from "../../shared/response-models/building-dto";
+import {BuildingEntity} from "../buldings/building.entity";
 
 @Injectable()
 export class VisitsService {
@@ -22,7 +23,7 @@ export class VisitsService {
     }
 
     public async createVisit(visit_body: VisitBuildingDto, user: UserEntity): Promise<VisitEntity> {
-        const building: BuildingEntity = await this.buildingsService.getBuildingById(visit_body.building_id)
+        const building: BuildingDto = await this.buildingsService.getBuildingById(visit_body.building_id, user)
 
         if (!building) {
             throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID);
@@ -56,10 +57,6 @@ export class VisitsService {
 
     }
 
-    public async getVisits(): Promise<VisitEntity[]> {
-        return await this.visitRepo.find()
-    }
-
     public async getUserVisits(userId: number): Promise<VisitDto[]> {
         const visits = await this.visitRepo.find({
             where: { user: { id: userId } },
@@ -71,10 +68,11 @@ export class VisitsService {
         return visits.map(visit => processVisitEntity(visit, userId));
     }
 
-    public async getBuildingVisits(building_id: number): Promise<VisitEntity[]> {
-        return await this.visitRepo.find({
-            where: {
-                building: {id: building_id}
-            }
-        })
-    }}
+    public async deleteBuildingVisits(building: BuildingEntity): Promise<void> {
+        const visitsIds: number[] = building.visits.map(visit => visit.id)
+        await this.achievementsService.deleteVisitsAchievements(visitsIds);
+
+        await this.visitRepo.delete({ building: { id: building.id } });
+
+    }
+}

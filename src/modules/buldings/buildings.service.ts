@@ -1,7 +1,7 @@
-import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common";
+import {BadRequestException, ConflictException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {BuildingEntity} from "./building.entity";
-import {Repository} from "typeorm";
+import {DeleteResult, Repository} from "typeorm";
 import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
 import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 import {BuildingDto} from "../../shared/response-models/building-dto";
@@ -9,6 +9,7 @@ import {UserDto} from "../../shared/response-models/user-dto";
 import {UserEntity} from "../users/user.entity";
 import {processUserEntity} from "../../shared/functions/process-user-entity";
 import {processBuildingEntity} from "../../shared/functions/process-building-entity";
+import {VisitEntity} from "../visits/visit.entity";
 
 @Injectable()
 export class BuildingsService {
@@ -70,31 +71,14 @@ export class BuildingsService {
     }
 
 
-    public async getBuildings(): Promise<BuildingEntity[]> {
-        // const buildings: BuildingEntity[] = this.buildingRepo.find();
-
-        return this.buildingRepo.find()
-
-        // return Promise.all(buildings.map(async (building) => {
-        //     console.log(visits)
-        //     const user_visits: VisitEntity[] = visits.filter(visit => visit.user.id === user.id);
-        //     console.log('user_visits: ', user_visits);
-        //
-        //     const user_buildings: BuildingEntity[] = await this.findUserBuildings(user.id);
-        //     console.log('user_buildings: ', user_buildings);
-        //
-        //     const processed_user: UserDto = processUserEntity(user, user_visits.length, user_buildings.length);
-        //     console.log('processed_user: ', processed_user);
-        //
-        //     const building_visits: VisitEntity[] = visits.filter(visit => visit.building.id === building.id);
-        //     console.log('building_visits: ', building_visits);
-        //
-        //     return processBuildingEntity(building, processed_user, building_visits.length, user_visits.some(visit => visit.building.id === building.id));
-        // }));
+    public async getBuildings(user: UserEntity): Promise<BuildingDto[]> {
+        return [...await this.getRawBuildings()].map(building => {
+            return processBuildingEntity(building, user.id)
+        })
     }
 
     public async updateBuilding(buildingId: number, buildingBody: CreateBuildingDto, user: UserEntity): Promise<BuildingDto> {
-        const building: BuildingEntity = await this.getBuildingById(buildingId);
+        const building: BuildingDto = await this.getBuildingById(buildingId, user);
 
         if (!building) {
             throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID);
@@ -114,30 +98,30 @@ export class BuildingsService {
         try {
             if (buildingName) {
                 await this.buildingRepo.update({id: buildingId}, {name: buildingName});
-                //return await this.buildingRepo.save(building);
             }
 
             if (buildingDesc) {
                 await this.buildingRepo.update({id: buildingId}, {description: buildingDesc});
-                //return await this.buildingRepo.save(building);
             }
 
-            return processBuildingEntity(await this.getBuildingById(buildingId), user.id)
+            return processBuildingEntity(await this.getBuildingEntityById(buildingId, user), user.id);
         } catch (error) {
+            if (error.code === 'ER_DUP_ENTRY') {
+                throw new ConflictException(EBadRequestMessages.EXISTING_BUILDING_NAME);
+            }
             throw error;
         }
 
     }
 
-    public async deleteBuilding(buildingId: number) {
-        const building: BuildingEntity = await this.getBuildingById(buildingId);
+    public async deleteBuilding(buildingId: number, user: UserEntity): Promise<DeleteResult> {
+        const building: BuildingDto = await this.getBuildingById(buildingId, user);
         if (!building) {
             throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
         try {
-            await this.buildingRepo.delete({id: buildingId});
-            return null;
+            return this.buildingRepo.delete({id: buildingId});
         } catch (error) {
             throw error;
         }
@@ -151,7 +135,22 @@ export class BuildingsService {
         })
     }
 
-    public async getBuildingById(building_id: number): Promise<BuildingEntity> {
+    public async getBuildingById(building_id: number, user: UserEntity): Promise<BuildingDto> {
+        const building: BuildingEntity = await this.buildingRepo.findOne({
+            where: {
+                id: building_id
+            },
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
+
+        if (!building) {
+            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
+        }
+
+        return processBuildingEntity(building, user.id);
+    }
+
+    private async getBuildingEntityById(building_id: number, user: UserEntity): Promise<BuildingEntity> {
         const building: BuildingEntity = await this.buildingRepo.findOne({
             where: {
                 id: building_id
@@ -163,6 +162,20 @@ export class BuildingsService {
             throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
-        return building;
+        return building
+    }
+
+    private async getRawBuildings(): Promise<BuildingEntity[]> {
+        return this.buildingRepo.find({
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
+
+    }
+
+    public async getBuildingWithRelations(buildingId: number): Promise<BuildingEntity> {
+        return this.buildingRepo.findOne({
+            where: {id: buildingId},
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
     }
 }

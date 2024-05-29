@@ -1,7 +1,7 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {MessageEntity} from "./message.entity";
-import {Repository} from "typeorm";
+import {DeleteResult, Repository} from "typeorm";
 import {ICreateMessageBody} from "./utils/interfaces/i-create-message-body";
 import {BuildingEntity} from "../buldings/building.entity";
 import {UserEntity} from "../users/user.entity";
@@ -38,14 +38,19 @@ export class MessagesService {
         return await this.messageRepo.find()
     }
 
-    public async getMessagesByBuilding(buildingId:number): Promise<MessageEntity[]> {
+    public async getMessagesByBuilding(buildingId: number): Promise<MessageEntity[]> {
         return await this.messageRepo.find({
             where: {
                 building: {
                     id: buildingId,
                 },
             },
-            relations: ['building'],
+            relations: ['building', 'user', 'user.visits'],
         });
+    }
+
+    public deleteBuildingMessages(building_id: number): Promise<DeleteResult> {
+        return this.messageRepo.delete({building: {id: building_id}})
+
     }
 }

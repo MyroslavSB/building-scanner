@@ -5,12 +5,14 @@ import {BuildingsController} from "./buildings.controller";
 import {BuildingsService} from "./buildings.service";
 import {UsersModule} from "../users/users.module";
 import {VisitsModule} from "../visits/visits.module";
+import {MessagesModule} from "../messages/messages.module";
 
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([BuildingEntity]),
         forwardRef(() => VisitsModule),
+        forwardRef(() => MessagesModule),
         UsersModule
     ],
     controllers: [BuildingsController],

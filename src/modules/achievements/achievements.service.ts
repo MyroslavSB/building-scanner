@@ -29,4 +29,12 @@ export class AchievementsService {
     public async getAchievements(): Promise<AchievementEntity[]> {
         return await this.achievementRepo.find()
     }
+
+    public async deleteVisitsAchievements(visitsIds: number[]): Promise<void> {
+        visitsIds.forEach(id => {
+            this.achievementRepo.delete({visit: {id}})
+        })
+
+        return
+    }
 }

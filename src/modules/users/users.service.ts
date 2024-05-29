@@ -4,8 +4,6 @@ import {UserEntity} from "./user.entity";
 import {Repository} from "typeorm";
 import {RegisterUserDto} from "./utils/dtos/register-user-dto";
 import * as bcrypt from 'bcrypt';
-import {UserDto} from "../../shared/response-models/user-dto";
-import {processUserEntity} from "../../shared/functions/process-user-entity";
 
 @Injectable()
 export class UsersService {

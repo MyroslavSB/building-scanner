@@ -1,7 +1,7 @@
 import {MessagesService} from "./messages.service";
 import {MessageEntity} from "./message.entity";
 
-import {Body, Controller, Get, HttpException, HttpStatus, Post, Param, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, HttpException, HttpStatus, Post, Param, UseGuards, Req} from "@nestjs/common";
 
 import {CreateMessageDto} from "./utils/dto/create-message-dto";
 import {
@@ -35,8 +35,8 @@ export class MessagesController {
         type: NoSuchBuildingResponse
     })
     @Post()
-    async createMessage(@Body() createMessageDto: CreateMessageDto): Promise<MessageEntity> {
-        const building = await this.buildingsService.getBuildingById(createMessageDto.building_id)
+    async createMessage(@Body() createMessageDto: CreateMessageDto, @Req() req): Promise<MessageEntity> {
+        const building = await this.buildingsService.getBuildingById(createMessageDto.building_id, req.user)
 
         if (!building) {
             throw new HttpException('Building with such id does not exist', HttpStatus.BAD_REQUEST);
