@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
 import {Repository} from "typeorm";
@@ -86,5 +86,40 @@ export class UsersService {
             },
             relations: ['buildings', 'visits', 'visits.building', 'achievements']
         }))
+    }
+
+    public async getRankings(sortBy: { sortBy: 'visits' } | { sortBy: 'achievements' }): Promise<UserDto[]> {
+
+        const queryBuilder = this.userRepo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.visits', 'visits')
+            .leftJoinAndSelect('user.achievements', 'achievements')
+            .leftJoinAndSelect('user.buildings', 'buildings');
+
+        queryBuilder.addSelect(subQuery => {
+            return subQuery
+                .select('COUNT(visits.id)', 'visitCount')
+                .from('visit', 'visits')
+                .where('visits.user_id = user.id');
+        }, 'visitCount');
+
+        queryBuilder.addSelect(subQuery => {
+            return subQuery
+                .select('COUNT(achievements.id)', 'achievementCount')
+                .from('achievement', 'achievements')
+                .where('achievements.user_id = user.id');
+        }, 'achievementCount');
+
+        // Apply ordering based on the sortBy parameter
+        if (sortBy.sortBy === 'visits') {
+            queryBuilder.orderBy('visitCount', 'DESC');
+        } else if (sortBy.sortBy === 'achievements') {
+            queryBuilder.orderBy('achievementCount', 'DESC');
+        } else {
+            throw new BadRequestException('Invalid sorting criteria');
+        }
+
+        const users = await queryBuilder.getMany();
+
+        return users.map(user => processUserEntity(user));
     }
 }
