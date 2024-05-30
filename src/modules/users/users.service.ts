@@ -63,9 +63,6 @@ export class UsersService {
         return user
     }
 
-    public async getUsers(): Promise<UserEntity[]> {
-        return await this.userRepo.find()
-    }
 
     public findByUsername(username: string): Promise<UserEntity> {
         return this.userRepo.findOneBy({ username });
@@ -76,7 +73,7 @@ export class UsersService {
             where: {
                 id
             },
-            relations: ['buildings', 'visits', 'visits.building']
+            relations: ['buildings', 'visits', 'visits.building', 'achievements']
         })
     }
 }

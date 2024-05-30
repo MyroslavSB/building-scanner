@@ -63,9 +63,11 @@ export class MessagesService {
                 'building.created_by',
                 'building.created_by.visits',
                 'building.created_by.buildings',
+                'building.created_by.achievements',
                 'user',
                 'user.visits',
-                'user.buildings'
+                'user.buildings',
+                'user.achievements'
             ],
             order: {
                 created_at: 'ASC',

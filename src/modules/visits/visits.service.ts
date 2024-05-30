@@ -57,8 +57,20 @@ export class VisitsService {
 
     public async getUserVisits(user: UserEntity): Promise<VisitDto[]> {
         const visits = await this.visitRepo.find({
-            where: { user: { id: user.id } },
-            relations: ['building', 'building.created_by', 'building.visits', 'building.visits.user', 'achievement', 'user', 'user.visits', 'user.buildings']
+            where: {user: {id: user.id}},
+            relations: [
+                'building',
+                'building.created_by',
+                'building.visits',
+                'building.visits.user',
+                'achievement', 'user',
+                'user.visits',
+                'user.buildings',
+                'user.achievements'
+            ],
+            order: {
+                visit_date: 'ASC'
+            }
         });
 
         return visits.map(visit => processVisitEntity(visit, visit.user));
@@ -68,7 +80,7 @@ export class VisitsService {
         const visitsIds: number[] = building.visits.map(visit => visit.id)
         await this.achievementsService.deleteVisitsAchievements(visitsIds);
 
-        await this.visitRepo.delete({ building: { id: building.id } });
+        await this.visitRepo.delete({building: {id: building.id}});
 
     }
 }

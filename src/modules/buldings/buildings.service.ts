@@ -154,7 +154,7 @@ export class BuildingsService {
             where: {
                 id: building_id
             },
-            relations: ['visits', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
         })
 
         if (!building) {
