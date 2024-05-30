@@ -18,6 +18,7 @@ import {ForbiddenMessage} from "../../shared/error-messages/forbidden-message";
 import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
 import {UnvisitedBuildingMessage} from "./utils/responses/unvisited-building.message";
 import {MessageDto} from "../../shared/response-models/message-dto";
+import {UserEntity} from "../users/user.entity";
 
 @ApiTags('messages')
 @ApiBearerAuth('access_token')
@@ -50,13 +51,8 @@ export class MessagesController {
         return this.messagesService.createMessage(createMessageDto, req.user, building);
     }
 
-    @Get()
-    public getUsers(): Promise<MessageEntity[]> {
-        return this.messagesService.getMessages()
-    }
-
     @Get(':id')
-    public getMessagesByBuilding(@Param('id') buildingId: number): Promise<MessageEntity[]> {
-        return this.messagesService.getMessagesByBuilding(buildingId)
+    public getMessagesByBuilding(@Param('id') buildingId: number, @Req() req): Promise<MessageDto[]> {
+        return this.messagesService.getMessagesByBuilding(buildingId, req.user)
     }
 }

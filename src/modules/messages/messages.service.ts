@@ -10,6 +10,7 @@ import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 import {BuildingDto} from "../../shared/response-models/building-dto";
 import {MessageDto} from "../../shared/response-models/message-dto";
 import {processMessageEntity} from "../../shared/functions/process-message-entity";
+import {processBuildingEntity} from "../../shared/functions/process-building-entity";
 
 @Injectable()
 export class MessagesService {
@@ -47,15 +48,29 @@ export class MessagesService {
         return await this.messageRepo.find()
     }
 
-    public async getMessagesByBuilding(buildingId: number): Promise<MessageEntity[]> {
-        return await this.messageRepo.find({
+    public async getMessagesByBuilding(buildingId: number, user: UserEntity): Promise<MessageDto[]> {
+
+        return (await this.messageRepo.find({
             where: {
                 building: {
                     id: buildingId,
                 },
             },
-            relations: ['building', 'user', 'user.visits'],
-        });
+            relations: [
+                'building',
+                'building.visits',
+                'building.visits.user',
+                'building.created_by',
+                'building.created_by.visits',
+                'building.created_by.buildings',
+                'user',
+                'user.visits',
+                'user.buildings'
+            ],
+            order: {
+                created_at: 'ASC',
+            },
+        })).map(message => processMessageEntity(message, processBuildingEntity(message.building, user.id)));
     }
 
     public deleteBuildingMessages(building_id: number): Promise<DeleteResult> {
