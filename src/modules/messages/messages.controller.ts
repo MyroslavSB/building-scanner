@@ -1,7 +1,17 @@
 import {MessagesService} from "./messages.service";
-import {MessageEntity} from "./message.entity";
-
-import {Body, Controller, Get, HttpException, HttpStatus, Post, Param, UseGuards, Req} from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Get,
+    HttpException,
+    HttpStatus,
+    Post,
+    Param,
+    UseGuards,
+    Req,
+    Query,
+    BadRequestException
+} from "@nestjs/common";
 
 import {CreateMessageDto} from "./utils/dto/create-message-dto";
 import {
@@ -14,11 +24,11 @@ import {
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {BuildingsService} from "../buldings/buildings.service";
 import {NoSuchBuildingResponse} from "./utils/responses/no-such-building-response";
-import {ForbiddenMessage} from "../../shared/error-messages/forbidden-message";
 import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
 import {UnvisitedBuildingMessage} from "./utils/responses/unvisited-building.message";
 import {MessageDto} from "../../shared/response-models/message-dto";
-import {UserEntity} from "../users/user.entity";
+import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
+import {BuildingDto} from "../../shared/response-models/building-dto";
 
 @ApiTags('messages')
 @ApiBearerAuth('access_token')
@@ -42,7 +52,7 @@ export class MessagesController {
     })
     @Post() //Tested, all good
     async createMessage(@Body() createMessageDto: CreateMessageDto, @Req() req): Promise<MessageDto> {
-        const building = await this.buildingsService.getBuildingById(createMessageDto.building_id, req.user)
+        const building: BuildingDto = await this.buildingsService.getBuildingById(createMessageDto.building_id, req.user)
 
         if (!building) {
             throw new HttpException('Building with such id does not exist', HttpStatus.BAD_REQUEST);
@@ -51,8 +61,15 @@ export class MessagesController {
         return this.messagesService.createMessage(createMessageDto, req.user, building);
     }
 
-    @Get(':id')
-    public getMessagesByBuilding(@Param('id') buildingId: number, @Req() req): Promise<MessageDto[]> {
+    @ApiBadRequestResponse({
+        description: 'Bad Request',
+        type: NoSuchBuildingResponse
+    })
+    @Get() //Tested, all good
+    public async getMessagesByBuilding(@Query('building_id') buildingId: number, @Req() req): Promise<MessageDto[]> {
+        if (!buildingId || !(await this.buildingsService.getBuildingById(buildingId, req.user))) {
+            throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID)
+        }
         return this.messagesService.getMessagesByBuilding(buildingId, req.user)
     }
 }
