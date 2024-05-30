@@ -8,6 +8,7 @@ export function processUserEntity(user: UserEntity): UserDto {
         username: user.username,
         role: user.role,
         visits_count: user.visits.length,
-        created_buildings_count: user.buildings.length
+        created_buildings_count: user.buildings.length,
+        achievements_count: user.achievements.length
     };
 }

@@ -18,6 +18,9 @@ export class UserDto {
     visits_count: number;
 
     @ApiProperty()
+    achievements_count: number;
+
+    @ApiProperty()
     created_buildings_count: number;
 
 }

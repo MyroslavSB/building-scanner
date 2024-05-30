@@ -1,6 +1,6 @@
 import {ApiBearerAuth, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
 import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
-import {Controller, UseGuards} from "@nestjs/common";
+import {Controller, Get, UseGuards} from "@nestjs/common";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 @ApiTags('rankings')
 @ApiBearerAuth('access_token')
@@ -8,14 +8,8 @@ import {JwtGuard} from "../../guards/jwt/jwt.guard";
 @UseGuards(JwtGuard)
 @Controller('rankings')
 export class RankingsController {
-
-    constructor(
-
-    ) {
+    @Get()
+    public getRankedUsers(): Promise<void> {
+return
     }
-
-    // @Get()
-    // public getRankedUsers(): Promise<> {
-    //
-    // }
 }
