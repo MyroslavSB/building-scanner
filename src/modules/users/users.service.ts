@@ -76,7 +76,7 @@ export class UsersService {
             where: {
                 id
             },
-            relations: ['buildings', 'visits']
+            relations: ['buildings', 'visits', 'visits.building']
         })
     }
 }
