@@ -9,7 +9,6 @@ import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
 import {UserEntity} from "../users/user.entity";
 import {processVisitEntity} from "../../shared/functions/process-visit-entity";
 import {VisitDto} from "../../shared/response-models/visit-dto";
-import {BuildingDto} from "../../shared/response-models/building-dto";
 import {BuildingEntity} from "../buldings/building.entity";
 
 @Injectable()

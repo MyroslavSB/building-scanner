@@ -4,6 +4,8 @@ import {UserEntity} from "./user.entity";
 import {Repository} from "typeorm";
 import {RegisterUserDto} from "./utils/dtos/register-user-dto";
 import * as bcrypt from 'bcrypt';
+import {UserDto} from "../../shared/response-models/user-dto";
+import {processUserEntity} from "../../shared/functions/process-user-entity";
 
 @Injectable()
 export class UsersService {
@@ -65,7 +67,7 @@ export class UsersService {
 
 
     public findByUsername(username: string): Promise<UserEntity> {
-        return this.userRepo.findOneBy({ username });
+        return this.userRepo.findOneBy({username});
     }
 
     public async findUserById(id: number): Promise<UserEntity> {
@@ -75,5 +77,14 @@ export class UsersService {
             },
             relations: ['buildings', 'visits', 'visits.building', 'achievements']
         })
+    }
+
+    public async findUserDtoById(id: number): Promise<UserDto> {
+        return processUserEntity(await this.userRepo.findOne({
+            where: {
+                id
+            },
+            relations: ['buildings', 'visits', 'visits.building', 'achievements']
+        }))
     }
 }
