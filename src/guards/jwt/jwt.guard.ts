@@ -14,8 +14,8 @@ export class JwtGuard implements CanActivate {
     }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest();
 
+        const request = context.switchToHttp().getRequest();
         const token: string = extractTokenFromHeader(request);
 
         if (!token) {
@@ -32,6 +32,7 @@ export class JwtGuard implements CanActivate {
 
             const userId = payload.sub;
             request.user = await this.usersService.findUserById(userId)
+
         } catch (err) {
             throw new UnauthorizedException(EUnauthorizedResponses.UNAUTHORIZED);
         }
