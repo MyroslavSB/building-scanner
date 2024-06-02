@@ -57,6 +57,11 @@ export class BuildingsController {
         return this.buildingsService.getBuildings(req.user)
     }
 
+    @Get('created')  //Tested, all good
+    public async getUserBuildings(@Req() req): Promise<BuildingDto[]> {
+        return this.buildingsService.getUserBuildings(req.user)
+    }
+
     @ApiBadRequestResponse({
         description: 'Bad Request',
         type: BadUpdateBuildingResponse,

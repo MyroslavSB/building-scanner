@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException, UnauthorizedException} from "@nestjs/common";
+import {ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {MessageEntity} from "./message.entity";
 import {DeleteResult, Repository} from "typeorm";
@@ -38,7 +38,7 @@ export class MessagesService {
                 throw error;
             }
         } else {
-            throw new UnauthorizedException(EBadRequestMessages.UNVISITED_BUILDING)
+            throw new ForbiddenException(EBadRequestMessages.UNVISITED_BUILDING)
         }
 
 

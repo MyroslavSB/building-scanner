@@ -126,14 +126,6 @@ export class BuildingsService {
         }
     }
 
-    private findUserBuildings(user_id: number): Promise<BuildingEntity[]> {
-        return this.buildingRepo.find({
-            where: {
-                created_by: {id: user_id}
-            }
-        })
-    }
-
     public async getBuildingById(building_id: number, user: UserEntity): Promise<BuildingDto> {
         const building: BuildingEntity = await this.buildingRepo.findOne({
             where: {
@@ -175,6 +167,19 @@ export class BuildingsService {
         return this.buildingRepo.findOne({
             where: {id: buildingId},
             relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
+    }
+
+    public async getUserBuildings(user: UserEntity): Promise<BuildingDto[]> {
+        const buildings = await this.buildingRepo.find({
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements'],
+            where: {
+                created_by: {id: user.id}
+            }
+        })
+
+        return buildings.map(building => {
+            return processBuildingEntity(building, user.id)
         })
     }
 }
