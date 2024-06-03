@@ -4,6 +4,21 @@ import {ValidationPipe} from "@nestjs/common";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import * as process from "process";
 
+const parseDbUrl = (databaseUrl: string) => {
+    const [full, username, password, host, port, database] = databaseUrl.match(
+        /mysql:\/\/(.*?):(.*?)@(.*?):(\d+)\/(.*)/
+    );
+    return { username, password, host, port, database };
+};
+
+const dbConfig = parseDbUrl(process.env.JAWSDB_URL);
+process.env.DB_HOST = dbConfig.host;
+process.env.DB_PORT = dbConfig.port;
+process.env.DB_USERNAME = dbConfig.username;
+process.env.DB_PASSWORD = dbConfig.password;
+process.env.DB_DATABASE = dbConfig.database;
+
+
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     app.useGlobalPipes(new ValidationPipe({
