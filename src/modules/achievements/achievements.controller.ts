@@ -1,10 +1,15 @@
 import {AchievementsService} from "./achievements.service";
-import {AchievementEntity} from "./achievement.entity";
-import {Controller, Get, UseGuards} from "@nestjs/common";
-import {ApiTags} from "@nestjs/swagger";
+import {Controller, Get, Req, UseGuards} from "@nestjs/common";
+import {ApiBearerAuth, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
+import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
+import {AchievementDto} from "../../shared/response-models/achievement-dto";
+import {AchievementEntity} from "./achievement.entity";
 
 @ApiTags('achievements')
+@ApiBearerAuth('access_token')
+@ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedMessage })
+@UseGuards(JwtGuard)
 @Controller('achievements')
 export class AchievementsController {
     constructor(
@@ -12,9 +17,8 @@ export class AchievementsController {
     ) {
     }
 
-    @UseGuards(JwtGuard)
-    @Get()
-    public getUsers(): Promise<AchievementEntity[]> {
-        return this.achievementsService.getAchievements()
+    @Get('')
+    public getUserAchievements(@Req() req): Promise<AchievementEntity[]> {
+        return this.achievementsService.getUserAchievements(req.user)
     }
 }

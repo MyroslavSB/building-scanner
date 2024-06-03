@@ -9,6 +9,7 @@ import {VisitsModule} from "./visits/visits.module";
 import {AchievementsModule} from "./achievements/achievements.module";
 import {AchievementEntity} from "./achievements/achievement.entity";
 import {AuthModule} from "./auth/auth.module";
+import {RankingsModule} from "./rankings/rankings.module";
 
 export const entities = [
     BuildingEntity,
@@ -19,10 +20,11 @@ export const entities = [
 ];
 
 export const modules = [
-    AchievementsModule,
     AuthModule,
     BuildingsModule,
+    AchievementsModule,
     MessagesModule,
     UsersModule,
-    VisitsModule
+    VisitsModule,
+    RankingsModule
 ];

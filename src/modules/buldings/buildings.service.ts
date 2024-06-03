@@ -1,11 +1,14 @@
-import {HttpException, HttpStatus, Injectable, NotFoundException} from "@nestjs/common";
+import {BadRequestException, ConflictException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {BuildingEntity} from "./building.entity";
-import {Repository} from "typeorm";
+import {DeleteResult, Repository} from "typeorm";
 import {CreateBuildingDto} from "./utils/interfaces/create-building-dto";
+import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
+import {BuildingDto} from "../../shared/response-models/building-dto";
+import {UserDto} from "../../shared/response-models/user-dto";
 import {UserEntity} from "../users/user.entity";
-import {VisitEntity} from "../visits/visit.entity";
-
+import {processUserEntity} from "../../shared/functions/process-user-entity";
+import {processBuildingEntity} from "../../shared/functions/process-building-entity";
 
 @Injectable()
 export class BuildingsService {
@@ -14,106 +17,169 @@ export class BuildingsService {
     ) {
     }
 
-    public async createBuilding(building_body: CreateBuildingDto, user: UserEntity): Promise<BuildingEntity> {
-
-        const building = this.buildingRepo.create({
+    public async createBuilding(building_body: CreateBuildingDto, user: UserEntity): Promise<BuildingDto> {
+        const building: BuildingEntity = this.buildingRepo.create({
             ...building_body,
             created_by: user
         })
-        const created_building = await this.getBuildingByName(building.name)
 
-        if (created_building) {
-            throw new HttpException('Building with such name has already been registered', HttpStatus.BAD_REQUEST);
+        const building_present: BuildingEntity = await this.getBuildingByName(building.name)
+
+        if (!!building_present) {
+            throw new BadRequestException(EBadRequestMessages.EXISTING_BUILDING_NAME);
+        }
+
+        const {
+            id,
+            name,
+            description,
+            location,
+            created_at,
+            updated_at,
+            qr_code
+        } = await this.buildingRepo.save(building)
+
+        const created_by: UserDto = processUserEntity(user)
+        created_by.created_buildings_count = created_by.created_buildings_count + 1
+
+        const buildingDto: BuildingDto = {
+            id,
+            name,
+            description,
+            location,
+            created_at,
+            updated_at,
+            qr_code,
+            visited: false,
+            visits_count: 0,
+            created_by
         }
 
         try {
-            return await this.buildingRepo.save(building)
+            return buildingDto
 
         } catch (error) {
             throw error;
         }
     }
 
-    public getBuildingById(building_id: number): Promise<BuildingEntity> {
-        const building = this.buildingRepo.findOneBy({
-            id: building_id
-        })
-
-        if (!building) {
-            throw new NotFoundException("Building with such id is not registered");
-        }
-
-        return building;
-    }
-
     public async getBuildingByName(building_name: string): Promise<BuildingEntity> {
-        const building = this.buildingRepo.findOneBy({
+        return await this.buildingRepo.findOneBy({
             name: building_name
         })
-
-        if (!building) {
-            throw new NotFoundException("Building with such name doesn't exist");
-        }
-
-        return building;
     }
 
 
-    public async getBuildings(visits_promise: Promise<VisitEntity[]>): Promise<BuildingEntity[]> {
-        const buildings = await this.buildingRepo.find();
-        const visits = await visits_promise
-        const visitedBuildingIds = visits.map(visit => visit.id)
-
-        return buildings.map(building => ({
-            ...building,
-            visited: visitedBuildingIds.includes(building.id),
-        }));
+    public async getBuildings(user: UserEntity): Promise<BuildingDto[]> {
+        return [...await this.getRawBuildings()].map(building => {
+            return processBuildingEntity(building, user.id)
+        })
     }
 
-    public async updateBuilding(buildingId: number, buildingBody: CreateBuildingDto) {
-        const building = await this.getBuildingById(buildingId);
+    public async updateBuilding(buildingId: number, buildingBody: CreateBuildingDto, user: UserEntity): Promise<BuildingDto> {
+        const building: BuildingDto = await this.getBuildingById(buildingId, user);
+
         if (!building) {
-            throw new NotFoundException('Building with such id is not registered');
+            throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
-        const buildingName = buildingBody.name;
-        const buildingDesc = buildingBody.description;
+        let buildingName: string = buildingBody.name;
+        let buildingDesc: string = buildingBody.description;
 
         if (!buildingBody.name) {
-            const buildingName = building.name;
+            buildingName = building.name;
         }
+
         if (!buildingBody.description) {
-            const buildingDesc = building.description;
+            buildingDesc = building.description;
         }
 
         try {
             if (buildingName) {
                 await this.buildingRepo.update({id: buildingId}, {name: buildingName});
-                //return await this.buildingRepo.save(building);
             }
 
             if (buildingDesc) {
                 await this.buildingRepo.update({id: buildingId}, {description: buildingDesc});
-                //return await this.buildingRepo.save(building);
             }
 
+            return processBuildingEntity(await this.getBuildingEntityById(buildingId, user), user.id);
         } catch (error) {
+            if (error.code === 'ER_DUP_ENTRY') {
+                throw new ConflictException(EBadRequestMessages.EXISTING_BUILDING_NAME);
+            }
             throw error;
         }
 
     }
 
-    public async deleteBuilding(buildingId: number) {
-        const building = await this.getBuildingById(buildingId);
+    public async deleteBuilding(buildingId: number, user: UserEntity): Promise<DeleteResult> {
+        const building: BuildingDto = await this.getBuildingById(buildingId, user);
         if (!building) {
-            throw new NotFoundException('Building with such id is not registered');
+            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
         try {
-            await this.buildingRepo.delete({id: buildingId});
-            return null;
+            return this.buildingRepo.delete({id: buildingId});
         } catch (error) {
             throw error;
         }
+    }
+
+    public async getBuildingById(building_id: number, user: UserEntity): Promise<BuildingDto> {
+        const building: BuildingEntity = await this.buildingRepo.findOne({
+            where: {
+                id: building_id
+            },
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
+
+        if (!building) {
+            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
+        }
+
+        return processBuildingEntity(building, user.id);
+    }
+
+    private async getBuildingEntityById(building_id: number, user: UserEntity): Promise<BuildingEntity> {
+        const building: BuildingEntity = await this.buildingRepo.findOne({
+            where: {
+                id: building_id
+            },
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
+
+        if (!building) {
+            throw new NotFoundException(EBadRequestMessages.BAD_BUILDING_ID);
+        }
+
+        return building
+    }
+
+    private async getRawBuildings(): Promise<BuildingEntity[]> {
+        return this.buildingRepo.find({
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
+
+    }
+
+    public async getBuildingWithRelations(buildingId: number): Promise<BuildingEntity> {
+        return this.buildingRepo.findOne({
+            where: {id: buildingId},
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements']
+        })
+    }
+
+    public async getUserBuildings(user: UserEntity): Promise<BuildingDto[]> {
+        const buildings = await this.buildingRepo.find({
+            relations: ['visits', 'visits.user', 'created_by', 'created_by.visits', 'created_by.buildings', 'created_by.achievements'],
+            where: {
+                created_by: {id: user.id}
+            }
+        })
+
+        return buildings.map(building => {
+            return processBuildingEntity(building, user.id)
+        })
     }
 }

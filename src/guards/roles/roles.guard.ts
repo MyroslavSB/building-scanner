@@ -5,6 +5,8 @@ import {Reflector} from "@nestjs/core";
 import {extractTokenFromHeader} from "../../shared/utils/functions/extract-token-from-header";
 import {jwtConstants} from "../../shared/utils/constants/jwt-constants";
 import {ROLES_KEY} from "../../shared/decorators/roles.decorator";
+import {EUnauthorizedResponses} from "../../shared/enums/e-unauthorized-responses";
+import {EForbiddenResponses} from "../../shared/enums/e-forbidden-responses";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -31,7 +33,7 @@ export class RolesGuard implements CanActivate {
         const token: string = extractTokenFromHeader(request);
 
         if (!token) {
-            throw new UnauthorizedException('No token RolesGuard');
+            throw new UnauthorizedException(EUnauthorizedResponses.UNAUTHORIZED);
         }
 
         const user = request.user
@@ -41,7 +43,7 @@ export class RolesGuard implements CanActivate {
         }
 
         if (!requiredRoles.includes(user.role)) {
-            throw new UnauthorizedException('Access denied: insufficient permissions');
+            throw new ForbiddenException(EForbiddenResponses.FORBIDDEN);
 
         }
 

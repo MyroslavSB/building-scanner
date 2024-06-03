@@ -1,12 +1,15 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {BadRequestException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {VisitEntity} from "./visit.entity";
 import {Repository} from "typeorm";
 import {VisitBuildingDto} from "./utils/interfaces/visit-building-dto";
-import {AchievementEntity} from "../achievements/achievement.entity";
-import {BuildingEntity} from "../buldings/building.entity";
 import {AchievementsService} from "../achievements/achievements.service";
 import {BuildingsService} from "../buldings/buildings.service";
+import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
+import {UserEntity} from "../users/user.entity";
+import {processVisitEntity} from "../../shared/functions/process-visit-entity";
+import {VisitDto} from "../../shared/response-models/visit-dto";
+import {BuildingEntity} from "../buldings/building.entity";
 
 @Injectable()
 export class VisitsService {
@@ -18,42 +21,69 @@ export class VisitsService {
     ) {
     }
 
-    public async createVisit(visit_body: VisitBuildingDto, userId: number): Promise<VisitEntity> {
-        const building: BuildingEntity = await this.buildingsService.getBuildingById(visit_body.building_id)
+    public async createVisit(visit_body: VisitBuildingDto, user: UserEntity): Promise<VisitDto> {
+        const building: BuildingEntity = await this.buildingsService.getBuildingWithRelations(visit_body.building_id)
 
         if (!building) {
-            throw new HttpException('Such building doesn\'t exist', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException(EBadRequestMessages.BAD_BUILDING_ID);
         }
 
         const previousVisit: VisitEntity = await this.visitRepo.findOneBy({
             building: {id: visit_body.building_id},
-            user: {id: userId}
+            user: {id: user.id}
         });
 
-        const visit = this.visitRepo.create({
-            building: {id: visit_body.building_id},
-            user: {id: userId},
-            visit_date: new Date().toISOString(), // or use another method to set the date appropriately
+        const visit: VisitEntity = this.visitRepo.create({
+            building,
+            user,
+            visit_date: new Date().toISOString()
         });
+
+        const saved: VisitEntity = await this.visitRepo.save(visit);
 
         if (!previousVisit) {
-            const saved = await this.visitRepo.save(visit);
-
             await this.achievementsService.createAchievement(
-                userId,
-                'building.name',
+                user,
+                building.name,
                 visit
             )
-
-            return saved
         }
 
-        return this.visitRepo.save(visit)
 
+        return processVisitEntity(saved, user)
 
     }
 
-    public async getVisits(): Promise<VisitEntity[]> {
-        return await this.visitRepo.find()
+    public async getUserVisits(user: UserEntity): Promise<VisitDto[]> {
+        const visits = await this.visitRepo.find({
+            relations: [
+                'building',
+                'building.created_by',
+                'building.visits',
+                'building.visits.user',
+                'achievement', 'user',
+                'user.visits',
+                'user.buildings',
+                'user.achievements'
+            ],
+            where: {
+                user: {id: user.id}
+            },
+            order: {
+                visit_date: 'ASC'
+            }
+        })
+
+        return visits.map(visit => {
+            return processVisitEntity(visit, visit.user)
+        });
+    }
+
+    public async deleteBuildingVisits(building: BuildingEntity): Promise<void> {
+        const visitsIds: number[] = building.visits.map(visit => visit.id)
+        await this.achievementsService.deleteVisitsAchievements(visitsIds);
+
+        await this.visitRepo.delete({building: {id: building.id}});
+
     }
 }

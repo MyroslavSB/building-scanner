@@ -23,7 +23,7 @@ export class VisitEntity {
         building => building.visits,
         {
             nullable: false
-        }) // Optionally define the reverse relation
+        })
     @JoinColumn({name: 'building_id'})
     building: BuildingEntity;
 
@@ -32,7 +32,7 @@ export class VisitEntity {
         user => user.visits,
         {
             nullable: false
-        }) // Optionally define the reverse relation
+        })
     @JoinColumn({name: 'user_id'})
     user: UserEntity;
 

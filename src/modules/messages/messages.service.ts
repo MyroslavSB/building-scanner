@@ -1,10 +1,16 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
+import {ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {MessageEntity} from "./message.entity";
-import {Repository} from "typeorm";
+import {DeleteResult, Repository} from "typeorm";
 import {ICreateMessageBody} from "./utils/interfaces/i-create-message-body";
 import {BuildingEntity} from "../buldings/building.entity";
 import {UserEntity} from "../users/user.entity";
+import {EUserRoles} from "../users/utils/enums/e-user-roles";
+import {EBadRequestMessages} from "../../shared/enums/e-bad-request-messages";
+import {BuildingDto} from "../../shared/response-models/building-dto";
+import {MessageDto} from "../../shared/response-models/message-dto";
+import {processMessageEntity} from "../../shared/functions/process-message-entity";
+import {processBuildingEntity} from "../../shared/functions/process-building-entity";
 
 @Injectable()
 export class MessagesService {
@@ -13,22 +19,26 @@ export class MessagesService {
     ) {
     }
 
-    public async createMessage(message_body: ICreateMessageBody, user_id: number): Promise<MessageEntity> {
-        try {
-            const message = new MessageEntity();
-            message.text = message_body.text;
-            message.building = {id: message_body.building_id} as BuildingEntity; // Set building by ID
-            message.user = {id: user_id} as UserEntity; // Set user by ID
-            message.created_at = new Date(); // Set created date
+    public async createMessage(message_body: ICreateMessageBody, user: UserEntity, building: BuildingDto): Promise<MessageDto> {
 
+        if (user.visits.map(visit => visit.building.id).includes(message_body.building_id) || user.role === EUserRoles.ADMIN) {
+            try {
+                const message = new MessageEntity();
+                message.text = message_body.text;
+                message.user = user;
+                message.building = {id: message_body.building_id} as BuildingEntity;
+                message.created_at = new Date();
 
-            return this.messageRepo.save(message);
-        } catch (error) {
-            if (error.code === 'ER_NO_REFERENCED_ROW' || error.code === 'ER_NO_REFERENCED_ROW_2') {
-                // Handle foreign key error
-                throw new NotFoundException('The provided building_id or user_id does not exist.');
+                return processMessageEntity(await this.messageRepo.save(message), building)
+            } catch (error) {
+                if (error.code === 'ER_NO_REFERENCED_ROW' || error.code === 'ER_NO_REFERENCED_ROW_2') {
+                    // Handle foreign key error
+                    throw new NotFoundException('The provided building_id or user_id does not exist.');
+                }
+                throw error;
             }
-            throw error;
+        } else {
+            throw new ForbiddenException(EBadRequestMessages.UNVISITED_BUILDING)
         }
 
 
@@ -38,14 +48,35 @@ export class MessagesService {
         return await this.messageRepo.find()
     }
 
-    public async getMessagesByBuilding(buildingId:number): Promise<MessageEntity[]> {
-        return await this.messageRepo.find({
+    public async getMessagesByBuilding(buildingId: number, user: UserEntity): Promise<MessageDto[]> {
+
+        return (await this.messageRepo.find({
             where: {
                 building: {
                     id: buildingId,
                 },
             },
-            relations: ['building'],
-        });
+            relations: [
+                'building',
+                'building.visits',
+                'building.visits.user',
+                'building.created_by',
+                'building.created_by.visits',
+                'building.created_by.buildings',
+                'building.created_by.achievements',
+                'user',
+                'user.visits',
+                'user.buildings',
+                'user.achievements'
+            ],
+            order: {
+                created_at: 'ASC',
+            },
+        })).map(message => processMessageEntity(message, processBuildingEntity(message.building, user.id)));
+    }
+
+    public deleteBuildingMessages(building_id: number): Promise<DeleteResult> {
+        return this.messageRepo.delete({building: {id: building_id}})
+
     }
 }

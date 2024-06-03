@@ -1,10 +1,11 @@
 import {ApiProperty} from "@nestjs/swagger";
+import {EBadRequestMessages} from "../../../../shared/enums/e-bad-request-messages";
 
 export class BadCreateBuildingResponse {
     @ApiProperty({example: 400})
     statusCode: number;
 
-    @ApiProperty({example: 'Building with such name has already been registered'})
+    @ApiProperty({example: EBadRequestMessages.EXISTING_BUILDING_NAME})
     message: string;
 
 }

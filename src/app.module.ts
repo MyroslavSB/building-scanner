@@ -8,10 +8,15 @@ import {JwtModule} from "@nestjs/jwt";
 import {jwtConstants} from "./shared/utils/constants/jwt-constants";
 import {RolesGuard} from "./guards/roles/roles.guard";
 import {JwtGuard} from "./guards/jwt/jwt.guard";
+import {ServeStaticModule} from "@nestjs/serve-static";
+import {join} from 'path'
 
 @Module({
     imports: [
         ConfigModule.forRoot(),
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', 'frontend/building-scanner-fe/browser'),
+        }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
