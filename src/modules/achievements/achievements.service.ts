@@ -4,6 +4,8 @@ import {AchievementEntity} from "./achievement.entity";
 import {Repository} from "typeorm";
 import {VisitEntity} from "../visits/visit.entity";
 import {UserEntity} from "../users/user.entity";
+import {processAchievementEntity} from "../../shared/functions/process-achievement-entity";
+import {AchievementDto} from "../../shared/response-models/achievement-dto";
 
 @Injectable()
 export class AchievementsService {
@@ -26,8 +28,29 @@ export class AchievementsService {
 
     }
 
-    public async getAchievements(): Promise<AchievementEntity[]> {
-        return await this.achievementRepo.find()
+    public async getUserAchievements(user: UserEntity): Promise<AchievementDto[]> {
+        return [...await this.achievementRepo.find({
+            relations: [
+                'visit',
+                'visit.user',
+                'visit.user.visits',
+                'visit.user.achievements',
+                'visit.user.buildings',
+                'visit.building',
+                'visit.building.created_by',
+                'visit.building.visits',
+                'visit.building.visits.user',
+                'user',
+                'user.visits',
+                'user.achievements',
+                'user.buildings'
+            ],
+            where: {
+                user: {id: user.id}
+            }
+        })].map(achievement => {
+            return processAchievementEntity(achievement)
+        })
     }
 
     public async deleteVisitsAchievements(visitsIds: number[]): Promise<void> {
