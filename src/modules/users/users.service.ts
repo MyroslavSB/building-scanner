@@ -1,4 +1,4 @@
-import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./user.entity";
 import {Repository} from "typeorm";
@@ -6,6 +6,8 @@ import {RegisterUserDto} from "./utils/dtos/register-user-dto";
 import * as bcrypt from 'bcrypt';
 import {UserDto} from "../../shared/response-models/user-dto";
 import {processUserEntity} from "../../shared/functions/process-user-entity";
+import {EUserRoles} from "./utils/enums/e-user-roles";
+import {PromoteUserDto} from "./utils/dtos/promote-user-dto";
 
 @Injectable()
 export class UsersService {
@@ -121,5 +123,25 @@ export class UsersService {
         const users = await queryBuilder.getMany();
 
         return users.map(user => processUserEntity(user));
+    }
+
+    public async promoteUser(promoteUserDto: PromoteUserDto, currentUser: UserEntity): Promise<UserDto> {
+        if (currentUser.role !== EUserRoles.ADMIN) {
+            throw new BadRequestException('Only admins can promote users to admin');
+        }
+
+        const { userId } = promoteUserDto;
+        const user = await this.findUserById(userId)
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        if (user.role === EUserRoles.ADMIN) {
+            throw new BadRequestException('User is already an admin');
+        }
+
+        user.role = EUserRoles.ADMIN;
+        return processUserEntity(await this.userRepo.save(user));
     }
 }

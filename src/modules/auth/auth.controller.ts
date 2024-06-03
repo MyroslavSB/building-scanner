@@ -10,6 +10,10 @@ import {BadRegisterResponse} from "./utils/responses/bad-register-response";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {UserDto} from "../../shared/response-models/user-dto";
 import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
+import {Roles} from "../../shared/decorators/roles.decorator";
+import {EUserRoles} from "../users/utils/enums/e-user-roles";
+import {RolesGuard} from "../../guards/roles/roles.guard";
+import {PromoteUserDto} from "../users/utils/dtos/promote-user-dto";
 
 @ApiTags('auth')
 @ApiBearerAuth('access_token')
@@ -46,11 +50,18 @@ export class AuthController {
     }
 
 
-    @ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedMessage })
+    @ApiUnauthorizedResponse({description: 'Unauthorized', type: UnauthorizedMessage})
     @UseGuards(JwtGuard)
     @Get('self')
     public async getSelf(@Req() req): Promise<UserDto> {
         return this.usersService.findUserDtoById(req.user.id)
+    }
+
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles(EUserRoles.ADMIN)
+    @Post('promote')
+    public promoteUser(@Body() makeAdminDto: PromoteUserDto, @Req() req): Promise<UserDto> {
+        return this.usersService.promoteUser(makeAdminDto, req.user)
     }
 }
 
