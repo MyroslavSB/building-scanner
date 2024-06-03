@@ -35,6 +35,7 @@ async function bootstrap() {
         transform: true
     }))
 
+
     app.enableCors({
         origin: 'http://localhost:4200',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
