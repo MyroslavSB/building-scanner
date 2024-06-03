@@ -44,7 +44,7 @@ export class VisitsController {
     }
 
     @Get() //Tested, all good
-    public getVisits(@Req() req): Promise<VisitDto[]> {
-        return this.visitsService.getUserVisits(req.user.id)
+    public getUserVisits(@Req() req): Promise<VisitDto[]> {
+        return this.visitsService.getUserVisits(req.user)
     }
 }

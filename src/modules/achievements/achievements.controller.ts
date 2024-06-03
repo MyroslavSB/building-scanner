@@ -1,7 +1,6 @@
 import {AchievementsService} from "./achievements.service";
-import {AchievementEntity} from "./achievement.entity";
 import {Controller, Get, Req, UseGuards} from "@nestjs/common";
-import {ApiBearerAuth, ApiForbiddenResponse, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
 import {AchievementDto} from "../../shared/response-models/achievement-dto";
