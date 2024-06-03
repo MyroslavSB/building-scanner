@@ -4,6 +4,7 @@ import {ApiBearerAuth, ApiTags, ApiUnauthorizedResponse} from "@nestjs/swagger";
 import {JwtGuard} from "../../guards/jwt/jwt.guard";
 import {UnauthorizedMessage} from "../../shared/error-messages/unauthorized-message";
 import {AchievementDto} from "../../shared/response-models/achievement-dto";
+import {AchievementEntity} from "./achievement.entity";
 
 @ApiTags('achievements')
 @ApiBearerAuth('access_token')
@@ -17,7 +18,7 @@ export class AchievementsController {
     }
 
     @Get('')
-    public getUserAchievements(@Req() req): Promise<AchievementDto[]> {
+    public getUserAchievements(@Req() req): Promise<AchievementEntity[]> {
         return this.achievementsService.getUserAchievements(req.user)
     }
 }

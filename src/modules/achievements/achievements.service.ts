@@ -28,28 +28,17 @@ export class AchievementsService {
 
     }
 
-    public async getUserAchievements(user: UserEntity): Promise<AchievementDto[]> {
-        return [...await this.achievementRepo.find({
+    public async getUserAchievements(user: UserEntity): Promise<AchievementEntity[]> {
+        return await this.achievementRepo.find({
             relations: [
                 'visit',
                 'visit.user',
-                'visit.user.visits',
-                'visit.user.achievements',
-                'visit.user.buildings',
                 'visit.building',
-                'visit.building.created_by',
-                'visit.building.visits',
-                'visit.building.visits.user',
                 'user',
-                'user.visits',
-                'user.achievements',
-                'user.buildings'
             ],
             where: {
                 user: {id: user.id}
             }
-        })].map(achievement => {
-            return processAchievementEntity(achievement)
         })
     }
 
