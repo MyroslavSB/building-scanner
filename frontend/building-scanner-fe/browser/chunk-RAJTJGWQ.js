@@ -1,0 +1,1 @@
+import{N as a}from"./chunk-ADDNN3XJ.js";var c=(()=>{let t=class t{getItem(e){return localStorage.getItem(e)}setItem(e,o){localStorage.setItem(e,o)}};t.\u0275fac=function(o){return new(o||t)},t.\u0275prov=a({token:t,factory:t.\u0275fac,providedIn:"root"});let r=t;return r})();export{c as a};

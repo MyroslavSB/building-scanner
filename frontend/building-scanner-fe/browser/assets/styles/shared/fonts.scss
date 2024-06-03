@@ -1,0 +1,32 @@
+@import "mixins";
+
+.heading {
+  &-1 {
+    @include font-base(24px, 700, 24px, normal, $poppins);
+  }
+
+  &-2 {
+    @include font-base(20px, 600, 20px, normal, $poppins);
+  }
+
+  &-3 {
+    @include font-base(16px, 700, 16px, normal, $poppins);
+
+  }
+}
+
+.medium {
+  @include font-base(12px, 400, 12px, normal, $poppins);
+
+  &-small {
+    @include font-base(10px, 400, 10px, normal, $poppins)
+  }
+}
+
+.button-text {
+  @include font-base(16px, 600, 16px, normal, $poppins);
+}
+
+
+
+
