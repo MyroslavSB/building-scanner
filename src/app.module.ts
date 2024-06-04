@@ -15,17 +15,17 @@ import {join} from 'path'
     imports: [
         ConfigModule.forRoot(),
         ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', 'frontend/building-scanner-fe/browser'),
+            rootPath: join(__dirname, '..', 'frontend', 'building-scanner-fe', 'browser'),
         }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
                 type: 'mysql',
-                host: configService.get('DB_HOST'),
-                port: configService.get('DB_PORT'),
-                username: configService.get('DB_USERNAME'),
-                password: configService.get('DB_PASSWORD'),
-                database: configService.get('DB_NAME'),
+                host: process.env.DB_HOST,
+                port: parseInt(process.env.DB_PORT, 10) || 3306,
+                username: process.env.DB_USERNAME,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_DATABASE,
                 entities: entities,
                 synchronize: true,
             }),
@@ -43,3 +43,18 @@ import {join} from 'path'
 })
 export class AppModule {
 }
+
+// TypeOrmModule.forRootAsync({
+//     imports: [ConfigModule],
+//     useFactory: (configService: ConfigService) => ({
+//         type: 'mysql',
+//         host: configService.get('DB_HOST'),
+//         port: configService.get('DB_PORT'),
+//         username: configService.get('DB_USERNAME'),
+//         password: configService.get('DB_PASSWORD'),
+//         database: configService.get('DB_NAME'),
+//         entities: entities,
+//         synchronize: true,
+//     }),
+//     inject: [ConfigService]
+// }),
